@@ -1,0 +1,15 @@
+#Internal package file, do not edit.
+#Thu Feb 22 09:57:33 EET 2018
+1.base=C\:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\build\\intermediates\\assets\\debug
+2.path=space.png
+0.baseType=DIRECTORY
+2.base=C\:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\build\\intermediates\\assets\\debug
+2.set=ASSET
+1.baseType=DIRECTORY
+count=3
+1.set=ASSET
+0.path=pallo.png
+0.set=ASSET
+0.base=C\:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\build\\intermediates\\assets\\debug
+2.baseType=DIRECTORY
+1.path=badlogic.jpg

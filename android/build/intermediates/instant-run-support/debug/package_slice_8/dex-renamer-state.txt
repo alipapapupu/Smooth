@@ -1,0 +1,4 @@
+#Thu Feb 22 03:09:03 EET 2018
+base.0=C\:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\build\\intermediates\\transforms\\dexMerger\\debug\\8
+path.0=classes.dex
+renamed.0=classes.dex
