@@ -165,7 +165,7 @@ class Player extends GameObject{
 
 		for (Food foods:bodyParts) {
 			foods.rotation=movement.getRotation(foods.position,position,size.y,rotation);
-			foods.position=movement.getPosition(foods.position,position,size.y,foods.rotation,rotation);
+			foods.position=movement.getPosition(position,size.y,foods.rotation,rotation);
 		}
 	}
 	void draw(SpriteBatch batch){
@@ -341,7 +341,7 @@ public void angle(boolean kumpi1, boolean kumpi2) {
 		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rotation) +newPos.x,size*MathUtils.sin(rotation) +newPos.y);
 		return MathUtils.atan2(position.y-connectPoint.y, position.x-connectPoint.x) * MathUtils.radiansToDegrees;
 	}
-	Vector2 getPosition(Vector2 position, Vector2 newPos, float size, float rot, float rotation){
+	Vector2 getPosition(Vector2 newPos, float size, float rot, float rotation){
 		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rotation) +newPos.x,size*MathUtils.sin(rotation) +newPos.y);
 		return new Vector2(size*MathUtils.cos(rot)+connectPoint.x, size*MathUtils.sin(rot)+connectPoint.y);
 	}
