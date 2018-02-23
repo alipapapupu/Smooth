@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Game extends ApplicationAdapter {
+
 	SpriteBatch batch;
 	OrthographicCamera camera=new OrthographicCamera();
 	Texture background;
@@ -30,6 +31,7 @@ public class Game extends ApplicationAdapter {
 	Movement foodMove;
 	Player player;
 	ArrayList<Food> foods=new ArrayList<Food>();
+
 	@Override
 	public void create () {
 		background=new Texture("space.png");
@@ -49,8 +51,10 @@ public class Game extends ApplicationAdapter {
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		player.move();
 		batch.begin();
 		batch.draw(background,-3,-2,0.01f*background.getWidth(),0.01f*background.getHeight());
+		draw(batch);
 		batch.end();
 	}
 	
@@ -87,7 +91,7 @@ abstract class GameObject {
 		this.game=game;
 		bounds=new Vector2(game.camera.viewportWidth/2,game.camera.viewportHeight/2);
 		this.position=position;
-		this.size = new Vector2(width, height);
+		this.size = new Vector2(sprite.getWidth()*width, sprite.getHeight()*height);
 		hitbox=new Rectangle(position.x,position.y,size.x,size.y);
 
 	}
@@ -100,14 +104,14 @@ abstract class GameObject {
 	}
 	void draw(SpriteBatch batch){
 		batch.setColor(colors[color]);
-		batch.draw(sprite, position.x, position.y,0.3f,0.3f,0.6f,0.6f,1,1,rotation,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
+		batch.draw(sprite, position.x-size.x/2, position.y-size.y/2,size.x/2,size.y/2,size.x,size.y,1,1,rotation,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
 		batch.setColor(Color.WHITE);
 
 	}
 }
 class Food extends GameObject{
 	Food(Vector2 position, Game game){
-		super(new Texture("pallo.png"),1,1, (int)Math.random()*(8-2)+2,position,game);
+		super(new Texture("badlogic.jpg"),0.001f,0.001f, (int)Math.random()*(8-2)+2,position,game);
 	}
 }
 class Player extends GameObject{
@@ -115,8 +119,9 @@ class Player extends GameObject{
 	Body body;
 	boolean ready=false;
 	OrthographicCamera camera;
+	ArrayList<Food> bodyParts=new ArrayList<Food>();
 	Player(Vector2 position, Game game,World world, OrthographicCamera camera,boolean gyroscope){
-		super(new Texture("badlogic.jpg"),1,1,0,position,game);
+		super(new Texture("badlogic.jpg"),0.001f,0.001f,0,position,game);
 		movement=new PlayerMove(gyroscope);
 
 		this.camera=camera;
@@ -127,7 +132,7 @@ class Player extends GameObject{
 		body = world.createBody(bodyDef);
 
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(sprite.getWidth()/2,sprite.getHeight()/2);
+		shape.setAsBox(size.x/2,size.y/2);
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = shape;
@@ -149,12 +154,25 @@ class Player extends GameObject{
 			}
 		}
 		position=body.getPosition();
-		camera.position.set(position,0);
+		camera.position.set(position.add(size.x/2,size.y/2),0);
 		camera.update();
+		for (Food foods:game.foods) {
+			if(foods.collision(hitbox)){
+				bodyParts.add(foods);
+				game.foods.remove(foods);
+			}
+		}
 
+		for (Food foods:bodyParts) {
+			foods.rotation=movement.getRotation(foods.position,position,size.y,rotation);
+			foods.position=movement.getPosition(foods.position,position,size.y,foods.rotation,rotation);
+		}
 	}
 	void draw(SpriteBatch batch){
-		batch.draw(sprite, position.x, position.y,0.3f,0.3f,0.6f,0.6f,1,1,rotation,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
+		batch.draw(sprite, position.x-size.x/2, position.y-size.y/2,size.x/2,size.y/2,size.x,size.y,1,1,rotation,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
+		for (Food foods:bodyParts) {
+			foods.draw(batch);
+		}
 	}
 }
 
@@ -180,11 +198,10 @@ class Movement{
 	}
 }
 
-
 class PlayerMove{
 	Vector2 zeroPoint = Vector2.Zero;
 	final float sadeX = 1.5f;
-	final float sadeY = 1.5f;
+	final float sadeY = 1f;
 	final float speed = 5;
 	final float error = 0.01f;
 	final int SIZE = 3;
@@ -217,7 +234,6 @@ class PlayerMove{
 	}
 
 	public boolean grid() {
-		empty();
 		getPoint();
 		if (point.y > sadeY || point.y < -sadeY) {
 			if (point.y > allRajat[which][0]) {
@@ -320,5 +336,13 @@ public void angle(boolean kumpi1, boolean kumpi2) {
 		} else {
 			point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, Gdx.input.getAccelerometerZ() - zeroPoint.y);
 		}
+	}
+	public float getRotation(Vector2 position, Vector2 newPos, float size, float rotation) {
+		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rotation) +newPos.x,size*MathUtils.sin(rotation) +newPos.y);
+		return MathUtils.atan2(position.y-connectPoint.y, position.x-connectPoint.x) * MathUtils.radiansToDegrees;
+	}
+	Vector2 getPosition(Vector2 position, Vector2 newPos, float size, float rot, float rotation){
+		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rotation) +newPos.x,size*MathUtils.sin(rotation) +newPos.y);
+		return new Vector2(size*MathUtils.cos(rot)+connectPoint.x, size*MathUtils.sin(rot)+connectPoint.y);
 	}
 }
