@@ -12,11 +12,24 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RopeJoint;
+import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -31,6 +44,8 @@ public class Game extends ApplicationAdapter {
 	Movement foodMove;
 	Player player;
 	ArrayList<Food> foods=new ArrayList<Food>();
+	Box2DDebugRenderer render;
+	Food eaten;
 
 	@Override
 	public void create () {
@@ -40,8 +55,42 @@ public class Game extends ApplicationAdapter {
 		world = new World(new Vector2(0, 0), true);
 		enemyMove=new Movement(-3,3);
 		foodMove=new Movement(-1,1);
-		foods.add(new Food(new Vector2(0,0),this));
+		foods.add(new Food(new Vector2(1,0),this));
+        foods.add(new Food(new Vector2(3,0),this));
+        foods.add(new Food(new Vector2(5,0),this));
+        foods.add(new Food(new Vector2(7,0),this));
 		player=new Player(new Vector2(0,0), this,world,camera,gyroscope);
+		render=new Box2DDebugRenderer();
+		world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Gdx.app.log("ASD","RGOJETRHBOERGREGGORJE");
+                if(contact.getFixtureA().getBody()==player.body||contact.getFixtureB().getBody()==player.body) {
+                    for (Food food:foods) {
+                        if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
+                            eaten=food;
+                            break;
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+
+            }
+        });
 	}
 
 	@Override
@@ -56,6 +105,8 @@ public class Game extends ApplicationAdapter {
 		batch.draw(background,-3,-2,0.01f*background.getWidth(),0.01f*background.getHeight());
 		draw(batch);
 		batch.end();
+
+		render.render(world,camera.combined);
 	}
 	
 	@Override
@@ -66,7 +117,7 @@ public class Game extends ApplicationAdapter {
 	public void draw(SpriteBatch batch){
 		player.draw(batch);
 		for (Food f : foods) {
-			f.draw(batch);
+			f.draw(batch,false);
 		}
 	}
 	void use(boolean gyroscope){
@@ -83,67 +134,113 @@ abstract class GameObject {
 	Texture sprite;
 	int color;
 	float rotation;
+	Body body;
+	Filter filter;
+
 	Color[] colors=new Color[]{Color.WHITE,Color.BLACK,Color.BLUE,Color.BROWN,Color.RED,Color.YELLOW,Color.ORANGE,Color.PINK,Color.PURPLE};
 
-	public GameObject(Texture tex, float width, float height,int color, Vector2 position,Game game){
+	public GameObject(Texture tex, float width, float height,int color, Vector2 position, short dontHit,short hit,  Game game){
 		sprite = tex;
 
+		this.color=color;
 		this.game=game;
 		bounds=new Vector2(game.camera.viewportWidth/2,game.camera.viewportHeight/2);
 		this.position=position;
 		this.size = new Vector2(sprite.getWidth()*width, sprite.getHeight()*height);
-		hitbox=new Rectangle(position.x,position.y,size.x,size.y);
+		hitbox=new Rectangle(position.x-size.x/2,position.y-size.y/2,size.x,size.y);
+		filter=new Filter();
+        filter.groupIndex=dontHit;
+        filter.categoryBits=hit;
+        createBody();
 
 	}
+	void createBody(){
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(position);
+
+        body = game.world.createBody(bodyDef);
+
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(size.x / 2, size.y / 2);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        fixtureDef.friction = 1;
+
+        body.createFixture(fixtureDef);
+        body.getFixtureList().first().setFilterData(filter);
+        body.getFixtureList().first().refilter();
+        shape.dispose();
+    }
 
 	boolean collision(Rectangle hitbox){
 		if(this.hitbox.overlaps(hitbox)){
+		    Gdx.app.log("ASD","ESDAFWOJEGFWEAJOGW");
 			return true;
 		}
 		return false;
 	}
-	void draw(SpriteBatch batch){
-		batch.setColor(colors[color]);
-		batch.draw(sprite, position.x-size.x/2, position.y-size.y/2,size.x/2,size.y/2,size.x,size.y,1,1,rotation,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
+	void draw(SpriteBatch batch, boolean bodyPart){
+        batch.setColor(colors[color]);
+	    if(bodyPart){
+            batch.draw(sprite, body.getPosition().x-size.x/2, body.getPosition().y-size.y/2, size.x/2, size.y/2, size.x, size.y, 1, 1, body.getAngle()*MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+        }else {
+            batch.draw(sprite, position.x - size.x / 2, position.y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), false, false);
+        }
 		batch.setColor(Color.WHITE);
 
 	}
 }
 class Food extends GameObject{
 	Food(Vector2 position, Game game){
-		super(new Texture("badlogic.jpg"),0.001f,0.001f, (int)Math.random()*(8-2)+2,position,game);
+		super(new Texture("badlogic.jpg"),0.001f,0.001f, (int)(Math.random()*(8-2)+2),position,(short)2,(short)1,game);
 	}
 }
 class Player extends GameObject{
 	PlayerMove movement;
-	Body body;
 	boolean ready=false;
 	OrthographicCamera camera;
 	ArrayList<Food> bodyParts=new ArrayList<Food>();
 	Player(Vector2 position, Game game,World world, OrthographicCamera camera,boolean gyroscope){
-		super(new Texture("badlogic.jpg"),0.001f,0.001f,0,position,game);
-		movement=new PlayerMove(gyroscope);
+		super(new Texture("badlogic.jpg"),0.001f,0.001f,0,position,(short)1,(short)2,game);
+		movement = new PlayerMove(gyroscope);
 
 		this.camera=camera;
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.type = BodyDef.BodyType.DynamicBody;
-		bodyDef.position.set(position);
 
-		body = world.createBody(bodyDef);
-
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(size.x/2,size.y/2);
-
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = shape;
-		fixtureDef.density = 1f;
-
-		Fixture fixture = body.createFixture(fixtureDef);
-
-		shape.dispose();
 	}
 	void move(){
 
+	    if(game.eaten!=null){
+	        Food eaten=game.eaten;
+            GameObject object;
+
+            if(bodyParts.size()==0){
+                object=this;
+            }else{
+                object=bodyParts.get(bodyParts.size()-1);
+            }
+
+
+            DistanceJointDef joint = new DistanceJointDef();
+            joint.bodyA = object.body;
+            joint.bodyB = eaten.body;
+            joint.length = 0.03f;
+            joint.localAnchorA.set(new Vector2( 0,-object.size.y / 2));
+            joint.localAnchorB.set(new Vector2(0, eaten.size.y / 2));
+            joint.collideConnected = false;
+            game.world.createJoint(joint);
+            eaten.filter=filter;
+            eaten.body.getFixtureList().first().setFilterData(eaten.filter);
+            eaten.body.getFixtureList().first().refilter();
+            body.getFixtureList().first().refilter();
+            bodyParts.add(eaten);
+            game.foods.remove(eaten);
+            game.eaten=null;
+        }
 		if(!ready){
 			ready=movement.grid();
 		}else{
@@ -154,25 +251,22 @@ class Player extends GameObject{
 			}
 		}
 		position=body.getPosition();
+		hitbox.setPosition(position);
+		body.setTransform(body.getPosition(),(rotation-90)*MathUtils.degreesToRadians);
+		body.setAngularVelocity(0);
 		camera.position.set(position.add(size.x/2,size.y/2),0);
 		camera.update();
-		for (Food foods:game.foods) {
-			if(foods.collision(hitbox)){
-				bodyParts.add(foods);
-				game.foods.remove(foods);
-			}
-		}
 
-		for (Food foods:bodyParts) {
-			foods.rotation=movement.getRotation(foods.position,position,size.y,rotation);
-			foods.position=movement.getPosition(position,size.y,foods.rotation,rotation);
+		for(Food foods : bodyParts){
+			foods.body.setLinearVelocity(0,0);
+			foods.body.setAngularVelocity(0);
 		}
 	}
 	void draw(SpriteBatch batch){
-		batch.draw(sprite, position.x-size.x/2, position.y-size.y/2,size.x/2,size.y/2,size.x,size.y,1,1,rotation,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
 		for (Food foods:bodyParts) {
-			foods.draw(batch);
+			foods.draw(batch,true);
 		}
+		batch.draw(sprite, position.x-size.x, position.y-size.y,size.x/2,size.y/2,size.x,size.y,1,1,rotation-90,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
 	}
 }
 
@@ -200,7 +294,7 @@ class Movement{
 
 class PlayerMove{
 	Vector2 zeroPoint = Vector2.Zero;
-	final float sadeX = 1.5f;
+	final float sadeX = 1f;
 	final float sadeY = 1f;
 	final float speed = 5;
 	final float error = 0.01f;
@@ -312,13 +406,17 @@ public void angle(boolean kumpi1, boolean kumpi2) {
 		getPoint();
 		Vector2 position = new Vector2(0, 0);
 		if (point.x >= sadeX) {
+			point.x-=sadeX;
 			position.x = Math.min(MAX, point.x / maxRajat[1]);
 		} else if (point.x <= -sadeX) {
+			point.x+=sadeX;
 			position.x = Math.max(-MAX, point.x / -maxRajat[3]);
 		}
 		if (point.y >= sadeY) {
+			point.y-=sadeY;
 			position.y = Math.min(MAX, point.y / maxRajat[0]);
 		} else if (point.y <= -sadeY) {
+			point.y+=sadeY;
 			position.y = Math.max(-MAX, point.y / -maxRajat[2]);
 		}
 		position.x *= speed;
@@ -327,7 +425,8 @@ public void angle(boolean kumpi1, boolean kumpi2) {
 	}
 
 	public float getRotation() {
-		return MathUtils.atan2(point.y, point.x) * MathUtils.radiansToDegrees;
+		float rotation=MathUtils.atan2(point.y, point.x) * MathUtils.radiansToDegrees;
+		return rotation-rotation%4;
 	}
 
 	void getPoint() {
@@ -338,11 +437,12 @@ public void angle(boolean kumpi1, boolean kumpi2) {
 		}
 	}
 	public float getRotation(Vector2 position, Vector2 newPos, float size, float rotation) {
-		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rotation) +newPos.x,size*MathUtils.sin(rotation) +newPos.y);
-		return MathUtils.atan2(position.y-connectPoint.y, position.x-connectPoint.x) * MathUtils.radiansToDegrees;
+		float rot=MathUtils.degreesToRadians*(rotation+180);
+		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rot) +newPos.x,size*MathUtils.sin(rot) +newPos.y);
+		return MathUtils.atan2(position.y-connectPoint.y, position.x+size-connectPoint.x);
 	}
-	Vector2 getPosition(Vector2 newPos, float size, float rot, float rotation){
-		Vector2 connectPoint=new Vector2(size*MathUtils.cos(rotation) +newPos.x,size*MathUtils.sin(rotation) +newPos.y);
-		return new Vector2(size*MathUtils.cos(rot)+connectPoint.x, size*MathUtils.sin(rot)+connectPoint.y);
+	Vector2 getPosition(Vector2 newPos, float size, float rotation){
+		float rot=MathUtils.degreesToRadians*(rotation+180);
+		return new Vector2(size*MathUtils.cos(rot) +newPos.x-size,size*MathUtils.sin(rot) +newPos.y);
 	}
 }
