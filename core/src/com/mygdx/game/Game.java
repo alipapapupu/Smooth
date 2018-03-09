@@ -131,17 +131,24 @@ abstract class GameObject {
 	Rectangle hitbox;
 	Vector2 position;
 	Vector2 size;
+	int shape;
 	Texture sprite;
 	int color;
 	float rotation;
 	Body body;
 	Filter filter;
+	String[] textures=new String[]{"badlogic.jpg"};
 
 	Color[] colors=new Color[]{Color.WHITE,Color.BLACK,Color.BLUE,Color.BROWN,Color.RED,Color.YELLOW,Color.ORANGE,Color.PINK,Color.PURPLE};
 
 	public GameObject(Texture tex, float width, float height,int color, Vector2 position, short dontHit,short hit,  Game game){
-		sprite = tex;
-
+		if(tex==null){
+			int r=(int)(Math.random()*textures.length);
+			sprite=new Texture(textures[r]);
+			shape=r;
+		}else {
+			sprite = tex;
+		}
 		this.color=color;
 		this.game=game;
 		bounds=new Vector2(game.camera.viewportWidth/2,game.camera.viewportHeight/2);
@@ -196,8 +203,9 @@ abstract class GameObject {
 	}
 }
 class Food extends GameObject{
+
 	Food(Vector2 position, Game game){
-		super(new Texture("badlogic.jpg"),0.001f,0.001f, (int)(Math.random()*(8-2)+2),position,(short)2,(short)1,game);
+		super(null,0.001f,0.001f, (int)(Math.random()*(8-2)+2),position,(short)2,(short)1,game);
 	}
 }
 class Player extends GameObject{
