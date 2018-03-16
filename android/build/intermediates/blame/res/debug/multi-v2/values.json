@@ -1,17 +1,34 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "C:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\res\\values\\styles.xml",
+                    "source": "C:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\res\\values\\strings.xml",
+                    "from": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "59",
+                        "endColumns": "43",
+                        "endOffsets": "98"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "43",
+                        "endOffsets": "94"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\res\\values\\styles.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
-                        "startOffsets": "17",
+                        "startOffsets": "19",
                         "endLines": "9",
                         "endColumns": "12",
-                        "endOffsets": "475"
+                        "endOffsets": "484"
                     },
                     "to": {
                         "startLines": "3",
@@ -20,23 +37,6 @@
                         "endLines": "10",
                         "endColumns": "12",
                         "endOffsets": "557"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\res\\values\\strings.xml",
-                    "from": {
-                        "startLines": "3",
-                        "startColumns": "4",
-                        "startOffsets": "56",
-                        "endColumns": "43",
-                        "endOffsets": "95"
-                    },
-                    "to": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "43",
-                        "endOffsets": "94"
                     }
                 }
             ]

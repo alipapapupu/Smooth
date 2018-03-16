@@ -1,4 +1,4 @@
-#Mon Mar 05 15:25:57 EET 2018
-base.0=C\:\\Users\\Severi\\Desktop\\libgdx\\Smooth\\android\\build\\intermediates\\transforms\\dexMerger\\debug\\4
+#Mon Mar 12 10:40:19 EET 2018
+base.0=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\transforms\\dexMerger\\debug\\4
 path.0=classes.dex
 renamed.0=classes.dex
