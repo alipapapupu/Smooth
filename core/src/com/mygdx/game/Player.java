@@ -19,11 +19,15 @@ class Player extends GameObject{
     PlayerMove movement;
     boolean ready=false;
     OrthographicCamera camera;
+    final boolean androidTest=false;
     ArrayList<Food> bodyParts=new ArrayList<Food>();
     Player(Vector2 position, Game game, World world, OrthographicCamera camera, boolean gyroscope){
         super(new Texture("player.png"),0.002f,0.002f,0,position,(short)1,(short)2,game);
-        movement = new PlayerMove(gyroscope);
-
+        if(androidTest) {
+            movement = new PlayerMove(gyroscope);
+        }else{
+            movement=new ComputerMove(gyroscope);
+        }
         this.camera=camera;
 
     }
