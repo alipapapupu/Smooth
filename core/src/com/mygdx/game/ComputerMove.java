@@ -12,7 +12,8 @@ public class ComputerMove extends PlayerMove {
     final float speeda=1f;
     public ComputerMove(boolean gyroscope){
         super(gyroscope);
-        maxRajat = new float[]{1, 1, 1, 1};
+        maxRajat = new float[]{1, 1, -1, -1};
+        zeroPoint=Vector2.Zero;
         getPoint();
 
     }

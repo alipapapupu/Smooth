@@ -56,10 +56,9 @@ public class Game extends ApplicationAdapter {
 		world = new World(new Vector2(0, 0), true);
 		enemyMove=new Movement(-3,3);
 		foodMove=new Movement(-1,1);
-		foods.add(new Food(new Vector2(1,0),this));
-        foods.add(new Food(new Vector2(3,0),this));
-        foods.add(new Food(new Vector2(5,0),this));
-        foods.add(new Food(new Vector2(7,0),this));
+		for(int i = 1; i < 10; i++) {
+			foods.add(new Food(new Vector2(i, 0), this));
+		}
 		player=new Player(new Vector2(0,0), this,world,camera,gyroscope);
 		render=new Box2DDebugRenderer();
 		world.setContactListener(new ContactListener() {
@@ -117,7 +116,7 @@ public class Game extends ApplicationAdapter {
 	public void draw(SpriteBatch batch){
 		player.draw(batch);
 		for (Food f : foods) {
-			f.draw(batch,false);
+			f.draw(batch);
 		}
 	}
 	void use(boolean gyroscope){

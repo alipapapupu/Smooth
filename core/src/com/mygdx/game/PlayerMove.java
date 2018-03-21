@@ -18,6 +18,7 @@ class PlayerMove{
     final float MAX = 3;
     int which = 0;
     Vector2 point;
+    Vector2 direction;
     float[] maxRajat = new float[]{0, 0, 0, 0};
     float testi = 0;
     public float[][] allRajat = new float[SIZE + 1][4];
@@ -27,6 +28,7 @@ class PlayerMove{
         this.gyroscope = gyroscope;
         getPoint();
         zeroPoint = point;
+        direction=new Vector2(0,0);
 
         for (int i = 0; i < allRajat.length; i++) {
             for (int o = 0; o < allRajat[i].length; o++) {
@@ -135,6 +137,21 @@ public void angle(boolean kumpi1, boolean kumpi2) {
         position.y *= speed;
         return position;
     }
+    /*public Vector2 getPosition(){
+        getPoint();
+        if (point.x >= sadeX) {
+            direction.x += Math.min(MAX, point.x / maxRajat[1]);
+        } else if (point.x <= -sadeX) {
+            direction.x += Math.max(-MAX, point.x / -maxRajat[3]);
+        }
+        if (point.y >= sadeY) {
+            direction.y += Math.min(MAX, point.y / maxRajat[0]);
+        } else if (point.y <= -sadeY) {
+            direction.y += Math.max(-MAX, point.y / -maxRajat[2]);
+        }
+        direction=new Vector2(MathUtils.clamp(direction.x,-sadeX,sadeX)*speed,MathUtils.clamp(direction.y,-sadeY,sadeY)*speed);
+        return direction;
+    }*/
 
     public float getRotation() {
         float rotation= MathUtils.atan2(point.y, point.x) * MathUtils.radiansToDegrees;
@@ -145,7 +162,7 @@ public void angle(boolean kumpi1, boolean kumpi2) {
         if (gyroscope) {
             point = new Vector2(Gdx.input.getGyroscopeZ() - zeroPoint.x, Gdx.input.getGyroscopeY() - zeroPoint.y);
         } else {
-            point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, Gdx.input.getAccelerometerZ() - zeroPoint.y);
+            point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, -Gdx.input.getAccelerometerX () - zeroPoint.y);
         }
     }
     public float getRotation(Vector2 position, Vector2 newPos, float size, float rotation) {
