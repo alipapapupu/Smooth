@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -47,11 +48,20 @@ public class Game extends ApplicationAdapter {
 	ArrayList<Food> foods=new ArrayList<Food>();
 	Box2DDebugRenderer render;
 	Food eaten;
+    Sprite backgroundTextureSprite;
+    float maxSpawnDistance = 25f;
+    float maxFoodDistance = 30f;
+    int maxBackgroundWidth = 1000;
+    int maxBackgroundHeight = 1000;
 
-	@Override
+
+    @Override
 	public void create () {
 		background=new Texture("jokugimptausta.png");
-		camera.setToOrtho(false,6,4);
+        background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        backgroundTextureSprite = new Sprite(background, 0, 0, maxBackgroundWidth, maxBackgroundHeight);
+
+        camera.setToOrtho(false,6,4);
 		batch = new SpriteBatch();
 		world = new World(new Vector2(0, 0), true);
 		enemyMove=new Movement(-3,3);
@@ -92,16 +102,129 @@ public class Game extends ApplicationAdapter {
         });
 	}
 
+    public int randomInt(int min, int max) {
+
+        Random random = new Random();
+
+        int randomNum = random.nextInt((max - min) + 1) + min;
+
+        return randomNum;
+    }
+
+    public float randomCoord(float min, float max) {
+
+        Random random = new Random();
+
+        float randomNum = min + random.nextFloat() * (max - min);
+
+        return randomNum;
+    }
+
+    public static float[] sortArray(float[] sectorWeightArray) {
+        float[] sortedSectorWeightArray = new float[sectorWeightArray.length];
+        float t;
+
+        for (int j = 0; j < sectorWeightArray.length - 1; j++) {
+
+            for (int i = 0; i < sectorWeightArray.length - 1; i++) {
+                if (sectorWeightArray[i] >= sectorWeightArray[i + 1]) {
+                    t = sectorWeightArray[i];
+                    sectorWeightArray[i] = sectorWeightArray[i + 1];
+                    sectorWeightArray[i + 1] = t;
+                    sortedSectorWeightArray = sectorWeightArray;
+
+                }
+            }
+        }
+        return sortedSectorWeightArray;
+    }
+
+    public void addFood() {
+        float topRightSector = player.movement.maxRajat[1] + player.movement.maxRajat[0];
+        float topLeftSector = Math.abs(player.movement.maxRajat[3]) + player.movement.maxRajat[0];
+        float botRightSector = player.movement.maxRajat[1] + Math.abs(player.movement.maxRajat[2]);
+        float botLeftSector = Math.abs(player.movement.maxRajat[3]) + Math.abs(player.movement.maxRajat[2]);
+
+        float botY = randomCoord(player.body.getPosition().y - maxSpawnDistance, player.body.getPosition().y);
+        float topY = randomCoord(player.body.getPosition().y, player.body.getPosition().y + maxSpawnDistance);
+        float leftX = randomCoord(player.body.getPosition().x - maxSpawnDistance, player.body.getPosition().x);
+        float rightX = randomCoord(player.body.getPosition().x, player.body.getPosition().x + maxSpawnDistance);
+
+        float sectorWeightArray[] = new float[]{topRightSector, topLeftSector, botRightSector, botLeftSector};
+
+        float sortedSectorWeightArray[] = sortArray(sectorWeightArray);
+
+        int randomInt = randomInt(1, 10);
+
+        if (randomInt > 6) {
+            if (sortedSectorWeightArray[0] == topRightSector) {
+                foods.add(new Food(new Vector2(rightX, topY),this));
+            } else if (sortedSectorWeightArray[0] == topLeftSector) {
+                foods.add(new Food(new Vector2(leftX, topY),this));
+            } else if (sortedSectorWeightArray[0] == botRightSector) {
+                foods.add(new Food(new Vector2(rightX, botY),this));
+            } else if (sortedSectorWeightArray[0] == botLeftSector) {
+                foods.add(new Food(new Vector2(leftX, botY),this));
+            }
+        } else if (randomInt > 3 && randomInt < 7) {
+            if (sortedSectorWeightArray[1] == topRightSector) {
+                foods.add(new Food(new Vector2(rightX, topY),this));
+            } else if (sortedSectorWeightArray[1] == topLeftSector) {
+                foods.add(new Food(new Vector2(leftX, topY),this));
+            } else if (sortedSectorWeightArray[1] == botRightSector) {
+                foods.add(new Food(new Vector2(rightX, botY),this));
+            } else if (sortedSectorWeightArray[1] == botLeftSector) {
+                foods.add(new Food(new Vector2(leftX, botY),this));
+            }
+        } else if (randomInt > 1 && randomInt < 4) {
+            if (sortedSectorWeightArray[2] == topRightSector) {
+                foods.add(new Food(new Vector2(rightX, topY),this));
+            } else if (sortedSectorWeightArray[2] == topLeftSector) {
+                foods.add(new Food(new Vector2(leftX, topY),this));
+            } else if (sortedSectorWeightArray[2] == botRightSector) {
+                foods.add(new Food(new Vector2(rightX, botY),this));
+            } else if (sortedSectorWeightArray[2] == botLeftSector) {
+                foods.add(new Food(new Vector2(leftX, botY),this));
+            }
+        } else {
+            if (sortedSectorWeightArray[3] == topRightSector) {
+                foods.add(new Food(new Vector2(rightX, topY),this));
+            } else if (sortedSectorWeightArray[3] == topLeftSector) {
+                foods.add(new Food(new Vector2(leftX, topY),this));
+            } else if (sortedSectorWeightArray[3] == botRightSector) {
+                foods.add(new Food(new Vector2(rightX, botY),this));
+            } else if (sortedSectorWeightArray[3] == botLeftSector) {
+                foods.add(new Food(new Vector2(leftX, botY),this));
+            }
+        }
+    }
+
+    public void foodDelete() {
+        for (Food food:foods) {
+            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y) {
+                foods.remove(food);
+                break;
+            }
+        }
+    }
+
 	@Override
-	public void render () {batch.setProjectionMatrix(camera.combined);
+	public void render () {
+		batch.setProjectionMatrix(camera.combined);
 
 		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if (foods.size() < 20) {
+            addFood();
+        }
+
+        foodDelete();
+
 		player.move();
 		batch.begin();
-		batch.draw(background,-3,-2,0.01f*background.getWidth(),0.01f*background.getHeight());
+        batch.draw(backgroundTextureSprite,-maxBackgroundWidth / 2,-maxBackgroundHeight / 2);
 		draw(batch);
 		batch.end();
 
