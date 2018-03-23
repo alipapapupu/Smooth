@@ -19,7 +19,7 @@ import com.badlogic.gdx.physics.box2d.Shape;
 
 abstract class GameObject {
 
-    Game game;
+    Scene scene;
     Vector2 bounds;
     Vector2 position;
     Vector2 size;
@@ -29,12 +29,12 @@ abstract class GameObject {
     float rotation;
     Body body;
     Filter filter;
-    String[] textures=new String[]{"circle.png"};
+    String[] textures=new String[]{"circle.png","square.png","triangle.png","diamond.png"};
     int type;
 
     Color[] colors=new Color[]{Color.WHITE,Color.BLACK,Color.BLUE,Color.BROWN,Color.RED,Color.YELLOW,Color.ORANGE,Color.PINK,Color.PURPLE};
 
-    public GameObject(Texture tex, float width, float height,int color, Vector2 position, Game game){
+    public GameObject(Texture tex, float width, float height,int color, Vector2 position, Scene scene){
         if(tex==null){
             int r=(int)(Math.random()*textures.length);
             sprite=new Texture(textures[r]);
@@ -51,8 +51,8 @@ abstract class GameObject {
             this.color = color;
         }
 
-        this.game=game;
-        bounds=new Vector2(game.camera.viewportWidth/2,game.camera.viewportHeight/2);
+        this.scene=scene;
+        bounds=new Vector2(scene.camera.viewportWidth/2,scene.camera.viewportHeight/2);
         this.position=position;
         this.size = new Vector2(sprite.getWidth()*width , sprite.getHeight()*height);
 
@@ -73,7 +73,7 @@ abstract class GameObject {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position);
 
-        body = game.world.createBody(bodyDef);
+        body = scene.world.createBody(bodyDef);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -102,4 +102,5 @@ abstract class GameObject {
     int randomColor(){
         return (int)(Math.random()*(8-2)+2);
     }
+    public abstract void move();
 }

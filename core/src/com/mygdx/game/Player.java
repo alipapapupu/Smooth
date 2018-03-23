@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,8 +24,9 @@ class Player extends GameObject{
     final boolean androidTest=true;
     ArrayList<Food> bodyParts=new ArrayList<Food>();
     Eye[][] eyes=new Eye[3][3];
-    Player(Vector2 position, Game game, World world, OrthographicCamera camera, boolean gyroscope){
-        super(new Texture("player.png"),0.002f,0.002f,0,position,game);
+    String[] playerTextures=new String[]{"player.png"};
+    Player(int tex, Vector2 position, Scene scene, World world, OrthographicCamera camera, boolean gyroscope){
+        super(new Texture("player.png"),0.002f,0.002f,1,position,scene);
         if(androidTest) {
             movement = new PlayerMove(gyroscope);
         }else{
@@ -33,19 +35,19 @@ class Player extends GameObject{
         this.camera=camera;
         createBody(this.size,false);
         for(int i = 0; i < eyes.length; i++){
-            eyes[i][0]=new Eye("eye.png",0.002f,0.002f,-1,position,game);
+            eyes[i][0]=new Eye("eye.png",0.002f,0.002f,-1,position,scene);
             for(int o = 1; o < eyes[i].length; o++){
-                eyes[i][o]=new Eye("line.png",0.0015f,0.002f,0,position,game);
+                eyes[i][o]=new Eye("line.png",0.0015f,0.002f,0,position,scene);
 
                 createJoint(eyes[i][o],eyes[i][o-1],0,0);
             }
             createJoint(this,eyes[i][eyes[i].length-1],(i-1)/5f,0.8f);
         }
     }
-    void move() {
+    public void move() {
 
-        if (game.eaten != null) {
-            Food eaten = game.eaten;
+        if (scene.eaten != null) {
+            Food eaten = scene.eaten;
             GameObject object;
 
             if (bodyParts.size() == 0) {
@@ -57,8 +59,8 @@ class Player extends GameObject{
             createJoint(object,eaten,0,0);
 
             bodyParts.add(eaten);
-            game.foods.remove(eaten);
-            game.eaten = null;
+            scene.foods.remove(eaten);
+            scene.eaten = null;
         }
         if (!ready) {
             ready = movement.grid();
@@ -119,7 +121,6 @@ class Player extends GameObject{
         joint.localAnchorA.set(new Vector2(0+xDif, -object1.size.y / 2+yDif-Math.abs(xDif)));
         joint.localAnchorB.set(new Vector2(0, object2.size.y / 2));
         joint.collideConnected = false;
-        joint.referenceAngle = 0;
-        game.world.createJoint(joint);
+        scene.world.createJoint(joint);
     }
 }

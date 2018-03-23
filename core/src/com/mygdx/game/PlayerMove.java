@@ -10,8 +10,8 @@ import com.badlogic.gdx.math.Vector2;
 
 class PlayerMove{
     Vector2 zeroPoint = Vector2.Zero;
-    final float sadeX = 1f;
-    final float sadeY = 1f;
+    final float sadeX = 0.2f;
+    final float sadeY = 0.2f;
     final float speed = 8;
     final float error = 0.01f;
     final int SIZE = 3;
@@ -20,6 +20,7 @@ class PlayerMove{
     Vector2 point;
     Vector2 direction;
     float[] maxRajat = new float[]{0, 0, 0, 0};
+    float[] testRajat=new float[]{0,0,0,0};
     float testi = 0;
     public float[][] allRajat = new float[SIZE + 1][4];
     boolean gyroscope;
@@ -43,10 +44,13 @@ class PlayerMove{
             getPoint();
             zeroPoint = point;
         }
+
     }
 
     public boolean grid() {
+        //empty();
         getPoint();
+        //test();
         if (point.y > sadeY || point.y < -sadeY) {
             if (point.y > allRajat[which][0]) {
                 Gdx.app.log("suunta", "" + 1);
@@ -162,7 +166,7 @@ public void angle(boolean kumpi1, boolean kumpi2) {
         if (gyroscope) {
             point = new Vector2(Gdx.input.getGyroscopeZ() - zeroPoint.x, Gdx.input.getGyroscopeY() - zeroPoint.y);
         } else {
-            point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, -Gdx.input.getAccelerometerX () - zeroPoint.y);
+            point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, (-Gdx.input.getAccelerometerX ()) - zeroPoint.y);
         }
     }
     public float getRotation(Vector2 position, Vector2 newPos, float size, float rotation) {
@@ -173,5 +177,30 @@ public void angle(boolean kumpi1, boolean kumpi2) {
     Vector2 getPosition(Vector2 newPos, float size, float rotation){
         float rot=MathUtils.degreesToRadians*(rotation+180);
         return new Vector2(size*MathUtils.cos(rot) +newPos.x-size,size*MathUtils.sin(rot) +newPos.y);
+    }
+
+    public void test(){
+        if(point.x>testRajat[1]){
+            testRajat[1]=point.x;
+        }else if(point.x<testRajat[3]){
+            testRajat[3]=point.x;
+        }
+        if(point.y>testRajat[0]){
+            testRajat[0]=point.y;
+        }else if(point.y<testRajat[2]){
+            testRajat[2]=point.y;
+        }
+        if (Gdx.input.isTouched()) {
+            Gdx.app.log("Big X",testRajat[1]+"");
+            Gdx.app.log("Small X",testRajat[3]+"");
+            Gdx.app.log("Big Y",testRajat[0]+"");
+            Gdx.app.log("Small Y",testRajat[2]+"");
+            testRajat=new float[]{0,0,0,0};
+            Gdx.app.log("ZeroPoint",zeroPoint+"");
+            getPoint();
+            Gdx.app.log("Point",point+"");
+            Gdx.app.log("Accelerometer",""+new Vector2(Gdx.input.getAccelerometerY(), (-Gdx.input.getAccelerometerX ())));
+            Gdx.app.log("Calculation",""+new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, (-Gdx.input.getAccelerometerX ()) - zeroPoint.y));
+        }
     }
 }

@@ -8,9 +8,12 @@ import com.badlogic.gdx.math.Vector2;
  */
 
 public class Eye extends GameObject {
-    public Eye(String name,float width, float height, int color, Vector2 position, Game game){
-        super(new Texture(name),width,height,color,position,game);
+    public Eye(String name,float width, float height, int color, Vector2 position, Scene scene){
+        super(new Texture(name),width,height,color,position,scene);
 
         createBody(size,true);
+    }
+    public void move(){
+
     }
 }

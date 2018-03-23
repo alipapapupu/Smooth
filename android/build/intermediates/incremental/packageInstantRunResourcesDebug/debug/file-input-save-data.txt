@@ -1,6 +1,7 @@
 #Internal package file, do not edit.
-#Tue Mar 20 02:12:29 EET 2018
+#Fri Mar 23 13:16:22 EET 2018
 4.path=square.png
+13.baseType=DIRECTORY
 8.set=ASSET
 6.path=jokugimptausta.xcf
 0.baseType=DIRECTORY
@@ -15,6 +16,7 @@
 7.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 11.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 9.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
+13.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 1.baseType=DIRECTORY
 11.set=ASSET
 0.set=ASSET
@@ -34,17 +36,19 @@
 9.path=player.png
 6.set=ASSET
 2.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
+13.path=background.png
 11.baseType=DIRECTORY
 4.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 3.baseType=DIRECTORY
 6.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 10.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
+13.set=ASSET
 8.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 2.set=ASSET
 8.baseType=DIRECTORY
 12.base=C\:\\Users\\Severi\\Dropbox\\smooth\\Smooth\\android\\build\\intermediates\\assets\\debug
 9.set=ASSET
-count=13
+count=14
 12.baseType=DIRECTORY
 4.baseType=DIRECTORY
 5.set=ASSET

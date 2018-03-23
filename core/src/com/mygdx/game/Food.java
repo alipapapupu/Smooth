@@ -9,8 +9,11 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Food extends GameObject{
 
-    Food(Vector2 position, Game game){
-        super(null,0.001f,0.001f, -1,position,game);
+    Food(Vector2 position, Scene scene){
+        super(null,0.001f,0.001f, -1,position,scene);
         createBody(size,true);
+    }
+    public void move(){
+
     }
 }
