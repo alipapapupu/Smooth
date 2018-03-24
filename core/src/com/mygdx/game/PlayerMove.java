@@ -23,10 +23,8 @@ class PlayerMove{
     float[] testBorder=new float[]{0,0,0,0};
     float testi = 0;
     public float[][] allBorder = new float[SIZE + 1][4];
-    boolean gyroscope;
 
-    public PlayerMove(boolean gyroscope) {
-        this.gyroscope = gyroscope;
+    public PlayerMove() {
         getPoint();
         zeroPoint = point;
         direction=new Vector2(0,0);
@@ -163,11 +161,7 @@ public void angle(boolean kumpi1, boolean kumpi2) {
     }
 
     void getPoint() {
-        if (gyroscope) {
-            point = new Vector2(Gdx.input.getGyroscopeZ() - zeroPoint.x, Gdx.input.getGyroscopeY() - zeroPoint.y);
-        } else {
-            point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, (-Gdx.input.getAccelerometerX ()) - zeroPoint.y);
-        }
+        point = new Vector2(Gdx.input.getAccelerometerY() - zeroPoint.x, (-Gdx.input.getAccelerometerX ()) - zeroPoint.y);
     }
     public float getRotation(Vector2 position, Vector2 newPos, float size, float rotation) {
         float rot=MathUtils.degreesToRadians*(rotation+180);

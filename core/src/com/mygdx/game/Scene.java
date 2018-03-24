@@ -38,11 +38,11 @@ public class Scene {
     int maxBackgroundHeight = 4;
 
 
-    public Scene(int tex, boolean gyroscope){
+    public Scene(int tex, boolean accelerometer){
         camera.setToOrtho(false,6,4);
         world = new World(new Vector2(0, 0), true);
         if(tex!=-1){
-            player=new Player(tex, new Vector2(0,0), this,world,camera,gyroscope);
+            player=new Player(tex, new Vector2(0,0), this,world,camera,accelerometer);
         }
         background=new Texture("background.png");
         background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);

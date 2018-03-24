@@ -2,25 +2,25 @@ package com.mygdx.game;
 
 import android.os.Bundle;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.mygdx.game.Game;
 
 public class AndroidLauncher extends AndroidApplication {
 
-	final boolean GYROSCOPE=false;
-
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-		config.useGyroscope = GYROSCOPE;
-		config.useAccelerometer = !GYROSCOPE;
+		final boolean ACCELEROMETER = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
+		config.useAccelerometer = ACCELEROMETER;
 		config.useCompass = false;
 
 		Game game=new Game();
-		game.use(GYROSCOPE);
+		game.use(ACCELEROMETER);
 
 		initialize(new Game(), config);
 	}

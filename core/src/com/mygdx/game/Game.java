@@ -38,7 +38,7 @@ import java.util.Random;
 public class Game extends ApplicationAdapter {
 
     SpriteBatch batch;
-    boolean gyroscope;
+    boolean accelerometer;
     Movement enemyMove;
     Movement foodMove;
     Box2DDebugRenderer render;
@@ -49,8 +49,8 @@ public class Game extends ApplicationAdapter {
     public void create () {
         batch = new SpriteBatch();
 
-        scenes[0]=new Scene(0,gyroscope);
-        scenes[1]=new Scene(-1,gyroscope);
+        scenes[0]=new Scene(0,accelerometer);
+        scenes[1]=new Scene(-1,accelerometer);
         enemyMove=new Movement(-3,3);
         foodMove=new Movement(-1,1);
 
@@ -67,8 +67,8 @@ public class Game extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 	}
-	void use(boolean gyroscope){
-		this.gyroscope=gyroscope;
+	void use(boolean accelerometer){
+		this.accelerometer=accelerometer;
 	}
 }
 
