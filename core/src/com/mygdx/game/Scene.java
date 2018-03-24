@@ -164,10 +164,10 @@ public class Scene {
     }
 
     public void addFood() {
-        float topRightSector = player.movement.maxRajat[1] + player.movement.maxRajat[0];
-        float topLeftSector = Math.abs(player.movement.maxRajat[3]) + player.movement.maxRajat[0];
-        float botRightSector = player.movement.maxRajat[1] + Math.abs(player.movement.maxRajat[2]);
-        float botLeftSector = Math.abs(player.movement.maxRajat[3]) + Math.abs(player.movement.maxRajat[2]);
+        float topRightSector = player.movement.maxBorder[1] + player.movement.maxBorder[0];
+        float topLeftSector = Math.abs(player.movement.maxBorder[3]) + player.movement.maxBorder[0];
+        float botRightSector = player.movement.maxBorder[1] + Math.abs(player.movement.maxBorder[2]);
+        float botLeftSector = Math.abs(player.movement.maxBorder[3]) + Math.abs(player.movement.maxBorder[2]);
 
         float botY = randomCoord(player.body.getPosition().y - maxSpawnDistance, player.body.getPosition().y);
         float topY = randomCoord(player.body.getPosition().y, player.body.getPosition().y + maxSpawnDistance);
