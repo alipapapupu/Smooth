@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -35,7 +36,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Game extends ApplicationAdapter {
+public class Game extends com.badlogic.gdx.Game {
 
     SpriteBatch batch;
     boolean accelerometer;
@@ -43,24 +44,40 @@ public class Game extends ApplicationAdapter {
     Movement foodMove;
     Box2DDebugRenderer render;
     Scene[] scenes=new Scene[2];
-    int scene=0;
+    int scene;
+    boolean calibrate=true;
+    BitmapFont font;
 
     @Override
     public void create () {
+        Gdx.app.log("ASD","ISD");
         batch = new SpriteBatch();
 
-        scenes[0]=new Scene(0,accelerometer);
-        scenes[1]=new Scene(-1,accelerometer);
+        accelerometer=true;
+        PlayerMove movement;
+        scenes[1]=new Scene(-1,null,false,this);
+        GameObject center=new GameObject(new Texture("chooser.png"),0.001f,0.001f,0,new Vector2(0,0),scenes[1]) {public void move() {}};
+        if(accelerometer) {
+            movement = new PlayerMove(center,this);
+        }else{
+            movement=new ComputerMove(center,this);
+        }
+        scenes[0]=new Scene(0,movement,true,this);
         enemyMove=new Movement(-3,3);
         foodMove=new Movement(-1,1);
 
+        scenes[1].addGameObject("calibration.png",0.003f,0.003f,0,0,0);
+        scenes[1].addGameObject(center);
         render=new Box2DDebugRenderer();
+        set(0);
     }
-
 
 	@Override
 	public void render () {
-        scenes[scene].draw(batch,render);
+        super.render();
+        if(calibrate){
+            scenes[1].draw(render);
+        }
 	}
 	
 	@Override
@@ -70,6 +87,12 @@ public class Game extends ApplicationAdapter {
 	void use(boolean accelerometer){
 		this.accelerometer=accelerometer;
 	}
+
+    public void set(int i){
+        scene=i;
+
+        setScreen(scenes[scene]);
+    }
 }
 
 

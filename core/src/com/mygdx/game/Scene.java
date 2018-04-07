@@ -1,56 +1,74 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Severi on 19.3.2018.
  */
 
-public class Scene {
+public class Scene extends ScreenAdapter {
     ArrayList<Food> foods=new ArrayList<Food>();
+    ArrayList<GameObject> gameObjects=new ArrayList<GameObject>();
     Player player;
     Food eaten;
     //ArrayList<Enemy> enemies=new ArrayList<Enemy>();
     World world;
     Texture background;
+    String[] backgrounds=new String[]{"background.png","calibration.png"};
     OrthographicCamera camera=new OrthographicCamera();
-
+    Random random = new Random();
+    boolean game;
+    SpriteBatch batch;
+    Game main;
+    int currentColorToCollect;
 
     Sprite backgroundTextureSprite;
-    float maxSpawnDistance = 25f;
-    float maxFoodDistance = 30f;
+    float maxSpawnDistance = 15f;
+    float maxFoodDistance = 10f;
     int maxBackgroundWidth = 4;
     int maxBackgroundHeight = 4;
 
 
-    public Scene(int tex, boolean accelerometer){
+    public Scene(int tex, PlayerMove move,boolean game, Game main){
+        this.game=game;
+        this.main=main;
+        batch=main.batch;
         camera.setToOrtho(false,6,4);
+        camera.translate(new Vector2(-camera.viewportWidth/2,-camera.viewportHeight/2));
+        camera.update();
         world = new World(new Vector2(0, 0), true);
-        if(tex!=-1){
-            player=new Player(tex, new Vector2(0,0), this,world,camera,accelerometer);
+        if(game){
+            player=new Player(tex, new Vector2(0,0), this,world,camera,move);
         }
-        background=new Texture("background.png");
-        background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        backgroundTextureSprite = new Sprite(background, 0,0,background.getWidth()*maxBackgroundWidth, background.getHeight()*maxBackgroundHeight);
-        backgroundTextureSprite.setPosition(-background.getWidth()*maxBackgroundWidth/2, -background.getHeight()*maxBackgroundHeight/2);
 
-        backgroundTextureSprite.setScale(0.01f);
+        if(tex!=-1) {
+            background = new Texture("background.png");
+            background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            backgroundTextureSprite = new Sprite(background, 0, 0, background.getWidth() * maxBackgroundWidth, background.getHeight() * maxBackgroundHeight);
+            backgroundTextureSprite.setPosition(-backgroundTextureSprite.getWidth() / 2, -backgroundTextureSprite.getHeight() / 2);
 
+            backgroundTextureSprite.setScale(0.01f);
+        }
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
@@ -60,7 +78,6 @@ public class Scene {
                             eaten=food;
                             break;
                         }
-
                     }
                 }
             }
@@ -80,30 +97,43 @@ public class Scene {
 
             }
         });
+
+        if(player!=null) {
+            Timer timer = new Timer();
+            TimerTask colorChange = new TimerTask() {
+                public void run() {
+                    currentColorToCollect = randomInt(2, 8);
+                    player.changeColor(currentColorToCollect);
+                }
+            };
+
+            timer.scheduleAtFixedRate(colorChange, 0, 300000);
+            player.color = currentColorToCollect;
+        }
     }
 
     public void addFood(float posX,float posY){
         foods.add(new Food(new Vector2(posX, posY), this));
     }
 
-    public void draw(SpriteBatch batch, Box2DDebugRenderer renderer){
-        move();
+    public void draw(Box2DDebugRenderer renderer){
+        if(game) {
+            move();
+        }
         batch.setProjectionMatrix(camera.combined);
 
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
-        Gdx.gl.glClearColor(1, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        if (foods.size() < 20) {
-            addFood();
-        }
-
-        foodDelete();
 
         batch.begin();
-        backgroundTextureSprite.draw(batch);
+        if(background!=null) {
+            backgroundTextureSprite.draw(batch);
+        }
         for(int i = 0; i < foods.size(); i++){
             foods.get(i).draw(batch);
+        }
+        for(int i = 0; i < gameObjects.size(); i++){
+            gameObjects.get(i).draw(batch);
         }
 
         if(player!=null) {
@@ -113,22 +143,37 @@ public class Scene {
 
         batch.end();
 
-        renderer.render(world,camera.combined);
+        //renderer.render(world,camera.combined);
     }
+
+    @Override
+    public void render(float delta) {
+        batch.setProjectionMatrix(camera.combined);
+
+        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        draw(null);
+    }
+
     void move(){
-        if(player!=null) {
-            player.move();
-        }
-        for(int i = 0; i < foods.size(); i++){
+        player.move();
+        for (int i = 0; i < foods.size(); i++) {
             foods.get(i).move();
         }
+
+        if (foods.size() < 20) {
+            addFood();
+        }
+
+        foodDelete();
+
+        backgroundMover();
     }
 
 
 
     public int randomInt(int min, int max) {
-
-        Random random = new Random();
 
         int randomNum = random.nextInt((max - min) + 1) + min;
 
@@ -137,9 +182,7 @@ public class Scene {
 
     public float randomCoord(float min, float max) {
 
-        Random random = new Random();
-
-        float randomNum = min + random.nextFloat() * (max - min);
+        float randomNum = min + random.nextFloat() * (max - min)+  min;
 
         return randomNum;
     }
@@ -226,9 +269,30 @@ public class Scene {
     public void foodDelete() {
         for (Food food:foods) {
             if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y) {
-                foods.remove(food);
+                food.destroy();
                 break;
             }
         }
+    }
+
+    void backgroundMover(){
+        if(player.position.x>backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2+backgroundTextureSprite.getWidth()/4*backgroundTextureSprite.getScaleX())){
+            backgroundTextureSprite.setX(backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2*backgroundTextureSprite.getScaleX()));
+        }else if(player.position.x<backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2-backgroundTextureSprite.getWidth()/4*backgroundTextureSprite.getScaleX())){
+            backgroundTextureSprite.setX(backgroundTextureSprite.getX()-(backgroundTextureSprite.getWidth()/2*backgroundTextureSprite.getScaleX()));
+        }
+        if(player.position.y>backgroundTextureSprite.getY()+(backgroundTextureSprite.getHeight()/2+backgroundTextureSprite.getHeight()/4*backgroundTextureSprite.getScaleY())){
+            backgroundTextureSprite.setY(backgroundTextureSprite.getY()+(backgroundTextureSprite.getHeight()/2*backgroundTextureSprite.getScaleY()));
+        }else if(player.position.y<backgroundTextureSprite.getY()+(backgroundTextureSprite.getHeight()/2-backgroundTextureSprite.getHeight()/4*backgroundTextureSprite.getScaleY())){
+            backgroundTextureSprite.setY(backgroundTextureSprite.getY()-(backgroundTextureSprite.getHeight()/2*backgroundTextureSprite.getScaleY()));
+        }
+    }
+
+    public void addGameObject(String tex, float width, float height,int color, int x, int y){
+        gameObjects.add(new GameObject(new Texture(tex),width, height, color, new Vector2(x,y),this) {public void move() {}});
+    }
+
+    public void addGameObject(GameObject object){
+        gameObjects.add(object);
     }
 }

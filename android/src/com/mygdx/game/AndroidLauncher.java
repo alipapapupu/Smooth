@@ -15,12 +15,13 @@ public class AndroidLauncher extends AndroidApplication {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-		final boolean ACCELEROMETER = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
+		final boolean ACCELEROMETER = true;
 		config.useAccelerometer = ACCELEROMETER;
 		config.useCompass = false;
 
 		Game game=new Game();
 		game.use(ACCELEROMETER);
+		config.useWakelock=true;
 
 		initialize(new Game(), config);
 	}

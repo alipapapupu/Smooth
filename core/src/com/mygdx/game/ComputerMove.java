@@ -10,13 +10,16 @@ import com.badlogic.gdx.math.Vector2;
 
 public class ComputerMove extends PlayerMove {
     final float speeda=1f;
-    public ComputerMove(){
+    public ComputerMove(GameObject center, Game game){
+        super(center,game);
         maxBorder = new float[]{1, 1, -1, -1};
         zeroPoint=Vector2.Zero;
         getPoint();
     }
     @Override
     public boolean grid(){
+
+        game.calibrate=false;
         return true;
     }
 

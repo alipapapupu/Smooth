@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.particles.influencers.ColorInfluencer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -83,6 +84,8 @@ abstract class GameObject {
         body.createFixture(fixtureDef);
         if(!food) {
             body.setFixedRotation(true);
+            fixtureDef.density=1000;
+            fixtureDef.friction=1;
         }
         else{
             body.getFixtureList().first().setSensor(true);
@@ -95,7 +98,11 @@ abstract class GameObject {
 
     void draw(SpriteBatch batch){
         batch.setColor(colors[color]);
-        batch.draw(sprite, body.getPosition().x-size.x/2, body.getPosition().y-size.y/2, size.x/2, size.y/2, size.x, size.y, 1, 1, body.getAngle()*MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+        if(body==null){
+            batch.draw(sprite, position.x - size.x / 2, position.y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+        }else {
+            batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+        }
         batch.setColor(Color.WHITE);
     }
 
@@ -103,4 +110,9 @@ abstract class GameObject {
         return (int)(Math.random()*(8-2)+2);
     }
     public abstract void move();
+
+    void destroy(){
+        scene.foods.remove(this);
+        scene.world.destroyBody(body);
+    }
 }
