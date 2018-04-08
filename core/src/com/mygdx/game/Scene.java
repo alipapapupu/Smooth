@@ -29,6 +29,7 @@ import java.util.TimerTask;
 public class Scene extends ScreenAdapter {
     ArrayList<Food> foods=new ArrayList<Food>();
     ArrayList<GameObject> gameObjects=new ArrayList<GameObject>();
+    ArrayList<Food> foodsToDelete=new ArrayList<Food>();
     Player player;
     Food eaten;
     //ArrayList<Enemy> enemies=new ArrayList<Enemy>();
@@ -78,6 +79,16 @@ public class Scene extends ScreenAdapter {
                             eaten=food;
                             break;
                         }
+                    //for (Food food:foods) {
+                    //    if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
+                    //        if (food.color == currentColorToCollect) {
+                    //            eaten=food;
+                    //        } else {
+                    //            foodsToDelete.add(food);
+                    //            foods.remove(food);
+                    //        }
+                    //        break;
+                    //    }
                     }
                 }
             }
@@ -107,7 +118,7 @@ public class Scene extends ScreenAdapter {
                 }
             };
 
-            timer.scheduleAtFixedRate(colorChange, 0, 300000);
+            timer.scheduleAtFixedRate(colorChange, 0, 15000);
             player.color = currentColorToCollect;
         }
     }
@@ -143,6 +154,7 @@ public class Scene extends ScreenAdapter {
 
         batch.end();
 
+        //deleteBodies();
         //renderer.render(world,camera.combined);
     }
 
@@ -162,11 +174,11 @@ public class Scene extends ScreenAdapter {
             foods.get(i).move();
         }
 
+        foodDelete();
+
         if (foods.size() < 20) {
             addFood();
         }
-
-        foodDelete();
 
         backgroundMover();
     }
@@ -266,6 +278,15 @@ public class Scene extends ScreenAdapter {
         }
     }
 
+    //void deleteBodies() {
+    //    for (Food food : foodsToDelete) {
+//
+    //        world.destroyBody(food.body);
+    //        break;
+    //    }
+    //    foodsToDelete.clear();
+    //}
+
     public void foodDelete() {
         for (Food food:foods) {
             if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y) {
@@ -274,6 +295,17 @@ public class Scene extends ScreenAdapter {
             }
         }
     }
+
+    //public void foodDelete() {
+    //    for (Food food:foods) {
+    //        if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y ||
+    //                food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
+    //            foodsToDelete.add(food);
+    //            foods.remove(food);
+    //            break;
+    //        }
+    //    }
+    //}
 
     void backgroundMover(){
         if(player.position.x>backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2+backgroundTextureSprite.getWidth()/4*backgroundTextureSprite.getScaleX())){
