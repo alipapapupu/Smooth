@@ -53,7 +53,7 @@ public class Game extends com.badlogic.gdx.Game {
 
     @Override
     public void create () {
-        //accelerometer=true;
+        accelerometer=true;
         batch = new SpriteBatch();
         font=new BitmapFont(Gdx.files.internal("fonts//font.txt"));
         PlayerMove movement;

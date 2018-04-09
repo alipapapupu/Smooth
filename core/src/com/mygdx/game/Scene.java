@@ -168,6 +168,7 @@ public class Scene extends ScreenAdapter {
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 
 
+        batch.setColor(Color.WHITE);
         batch.begin();
         if(background!=null) {
             backgroundTextureSprite.draw(batch);
