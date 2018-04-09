@@ -44,8 +44,8 @@ public class Scene extends ScreenAdapter {
     int currentColorToCollect;
 
     Sprite backgroundTextureSprite;
-    float maxSpawnDistance = 15f;
-    float maxFoodDistance = 10f;
+    float maxSpawnDistance = 12f;
+    float maxFoodDistance = 16f;
     int maxBackgroundWidth = 4;
     int maxBackgroundHeight = 4;
 
@@ -76,19 +76,18 @@ public class Scene extends ScreenAdapter {
                 if(contact.getFixtureA().getBody()==player.body||contact.getFixtureB().getBody()==player.body) {
                     for (Food food:foods) {
                         if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
-                            eaten=food;
+                            if (food.color == currentColorToCollect) {
+                                eaten=food;
+                            } else {
+                                if (player.bodyParts.size() > 0) {
+                                    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                }
+                                foodsToDelete.add(food);
+                                foods.remove(food);
+                            }
                             break;
                         }
-                    //for (Food food:foods) {
-                    //    if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
-                    //        if (food.color == currentColorToCollect) {
-                    //            eaten=food;
-                    //        } else {
-                    //            foodsToDelete.add(food);
-                    //            foods.remove(food);
-                    //        }
-                    //        break;
-                    //    }
                     }
                 }
             }
@@ -113,7 +112,7 @@ public class Scene extends ScreenAdapter {
             Timer timer = new Timer();
             TimerTask colorChange = new TimerTask() {
                 public void run() {
-                    currentColorToCollect = randomInt(2, 8);
+                    currentColorToCollect = randomInt(2, 7);
                     player.changeColor(currentColorToCollect);
                 }
             };
@@ -154,8 +153,9 @@ public class Scene extends ScreenAdapter {
 
         batch.end();
 
-        //deleteBodies();
+        deleteBodies();
         //renderer.render(world,camera.combined);
+
     }
 
     @Override
@@ -194,7 +194,7 @@ public class Scene extends ScreenAdapter {
 
     public float randomCoord(float min, float max) {
 
-        float randomNum = min + random.nextFloat() * (max - min)+  min;
+        float randomNum = random.nextFloat() * (max - min)+  min;
 
         return randomNum;
     }
@@ -278,34 +278,25 @@ public class Scene extends ScreenAdapter {
         }
     }
 
-    //void deleteBodies() {
-    //    for (Food food : foodsToDelete) {
-//
-    //        world.destroyBody(food.body);
-    //        break;
-    //    }
-    //    foodsToDelete.clear();
-    //}
+    void deleteBodies() {
+        for (Food food : foodsToDelete) {
+            world.destroyBody(food.body);
+            break;
+        }
+        foodsToDelete.clear();
+    }
+
 
     public void foodDelete() {
         for (Food food:foods) {
-            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y) {
-                food.destroy();
+            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y ||
+                    food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
+                foodsToDelete.add(food);
+                foods.remove(food);
                 break;
             }
         }
     }
-
-    //public void foodDelete() {
-    //    for (Food food:foods) {
-    //        if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y ||
-    //                food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
-    //            foodsToDelete.add(food);
-    //            foods.remove(food);
-    //            break;
-    //        }
-    //    }
-    //}
 
     void backgroundMover(){
         if(player.position.x>backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2+backgroundTextureSprite.getWidth()/4*backgroundTextureSprite.getScaleX())){
