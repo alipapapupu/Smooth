@@ -78,7 +78,7 @@ abstract class GameObject {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
+        fixtureDef.density = 0.001f;
         fixtureDef.friction = 0;
 
         body.createFixture(fixtureDef);
@@ -97,22 +97,36 @@ abstract class GameObject {
 
 
     void draw(SpriteBatch batch){
+        Color backup=batch.getColor();
         batch.setColor(colors[color]);
         if(body==null){
             batch.draw(sprite, position.x - size.x / 2, position.y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
         }else {
             batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
         }
-        batch.setColor(Color.WHITE);
+        batch.setColor(backup);
     }
 
     int randomColor(){
-        return (int)(Math.random()*(8-2)+2);
+        return (int)(Math.random()*(colors.length-2)+2);
     }
     public abstract void move();
 
     void destroy(){
-        scene.foods.remove(this);
+        if(this.getClass()==Food.class) {
+            scene.foods.remove(this);
+        }else if(this.getClass()==Player.class){
+            for (int i = 0; i < scene.player.bodyParts.size(); i++) {
+                scene.player.bodyParts.get(i).destroy();
+            }
+            for(int i = 0; i < scene.player.eyes.length; i++){
+                for(int o = 0; o < scene.player.eyes[i].length; o++){
+                    scene.player.eyes[i][o].destroy();
+                }
+            }
+            scene.player=null;
+
+        }
         scene.world.destroyBody(body);
     }
 }

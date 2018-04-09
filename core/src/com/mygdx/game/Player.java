@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
 import java.util.ArrayList;
@@ -29,22 +30,25 @@ class Player extends GameObject{
     String[] playerTextures=new String[]{"player.png"};
     RevoluteJointDef joint;
     Player(int tex, Vector2 position, Scene scene, World world, OrthographicCamera camera, PlayerMove move){
-        super(new Texture("player.png"),0.002f,0.002f,1,position,scene);
+        super(new Texture("player2.png"),0.002f,0.002f,scene.currentColorToCollect,position,scene);
         movement=move;
 
+        this.scene=scene;
         this.camera=camera;
         zoomChanger=new Changer(camera.zoom,200);
         colorChanger=new Changer(colors[color],200);
 
         createBody(this.size,false);
+
         joint = new RevoluteJointDef();
         joint.collideConnected = false;
-        for(int i = 0; i < eyes.length; i++){
-            eyes[i][0]=new Eye("eye.png",0.002f,0.002f,-1,position,scene);
-            for(int o = 1; o < eyes[i].length; o++){
-                eyes[i][o]=new Eye("line.png",0.0015f,0.002f,0,position,scene);
 
-                createJoint(eyes[i][o],eyes[i][o-1],0,0);
+        for(int i = 0; i < eyes.length; i++){
+            eyes[i][0]=new Eye("eye_new.png",0.0005f,0.0005f,-1,position,scene,true);
+            for(int o = 1; o < eyes[i].length; o++){
+                eyes[i][o]=new Eye("line.png",0.0015f,0.0025f,0,position,scene,false);
+
+                createJoint(eyes[i][o],eyes[i][o-1],0,0.001f);
             }
             createJoint(this,eyes[i][eyes[i].length-1],(i-1)/5f,0.8f);
         }
@@ -67,28 +71,29 @@ class Player extends GameObject{
             scene.foods.remove(eaten);
             scene.eaten = null;
 
-            zoomChanger.newTime(1f/bodyParts.size()/10);
+            scene.score++;
+            zoomChanger.newTime(camera.zoom+1f/bodyParts.size()/10);
+        }
+        for(Eye[] eye:eyes){
+            eye[0].move();
+            float angle=body.getAngle()+180*MathUtils.degreesToRadians;
+            for(int i = eye.length-1; i>=0; i--) {
+                angle=eye[i].rotate(angle);
+            }
         }
 
         zoomChanger.next();
         colorChanger.next();
 
+        camera.zoom=zoomChanger.fromZoom;
         playerColor=colorChanger.color;
 
         if (!ready) {
             ready = movement.grid();
-        } else {
+        } else if(scene.scene==0||movement.getClass()==MenuMove.class) {
 
             Vector2 add = movement.getPosition();
             if (!add.isZero()) {
-                //int test = bodyParts.size() + 1;
-                //add=new Vector2(add.x*test,add.y*test);
-                //position.add(add);
-                //body.applyForceToCenter(add,true);
-                /*for(int i = 1; i < bodyParts.size(); i++){
-                    bodyParts.get(i).body.applyForceToCenter(bodyParts.get(i-1).position.cpy().sub(bodyParts.get(i).position),true);
-                }*/
-
                 if(rotation<movement.getRotation()-3||rotation>movement.getRotation()+3) {
                     float rot = (movement.getRotation() - rotation);
                     if(rot>180){
@@ -103,6 +108,9 @@ class Player extends GameObject{
                 }
                 float testSpeed=Math.abs(add.x)+Math.abs(add.y);
                 body.setLinearVelocity(MathUtils.cos((rotation) * MathUtils.degreesToRadians)*testSpeed,MathUtils.sin((rotation) * MathUtils.degreesToRadians)*testSpeed);
+                for (Eye[] eye:eyes) {
+                    eye[0].body.setLinearVelocity(body.getLinearVelocity().x,body.getLinearVelocity().y);
+                }
             }
         }
         if(rotation>180){
@@ -114,12 +122,7 @@ class Player extends GameObject{
         body.setTransform(position, (rotation - 90) * MathUtils.degreesToRadians);
         camera.position.set(position,0);
         camera.update();
-        for (Food foods : bodyParts) {
-            //foods.body.setLinearVelocity(new Vector2(0,0));
-        }
-        for(Eye[] eye:eyes){
-            eye[0].move();
-        }
+
     }
     void draw(SpriteBatch batch){
         for (int i = bodyParts.size()-1; i>=0; i--) {
@@ -127,12 +130,12 @@ class Player extends GameObject{
         }
         batch.setColor(playerColor);
         batch.draw(sprite, position.x-size.x/2, position.y-size.y/2,size.x/2,size.y/2,size.x,size.y,1,1,rotation-90,0,0,sprite.getWidth(),sprite.getHeight(),false,false);
-        batch.setColor(Color.WHITE);
         for(int i = 0; i<eyes.length; i++){
             for(int o = eyes[i].length-1; o >=0; o--){
                 eyes[i][o].draw(batch);
             }
         }
+        batch.setColor(Color.WHITE);
     }
     void createJoint(GameObject object1, GameObject object2, float xDif,float yDif){
         joint.bodyA = object1.body;

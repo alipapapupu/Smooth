@@ -2,11 +2,13 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -16,7 +18,9 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Align;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -30,6 +34,7 @@ public class Scene extends ScreenAdapter {
     ArrayList<Food> foods=new ArrayList<Food>();
     ArrayList<GameObject> gameObjects=new ArrayList<GameObject>();
     ArrayList<Food> foodsToDelete=new ArrayList<Food>();
+    ArrayList<MiniScene> miniScenes=new ArrayList<MiniScene>();
     Player player;
     Food eaten;
     //ArrayList<Enemy> enemies=new ArrayList<Enemy>();
@@ -37,11 +42,23 @@ public class Scene extends ScreenAdapter {
     Texture background;
     String[] backgrounds=new String[]{"background.png","calibration.png"};
     OrthographicCamera camera=new OrthographicCamera();
+    OrthographicCamera fontCamera=new OrthographicCamera();
     Random random = new Random();
     boolean game;
     SpriteBatch batch;
+    ShapeRenderer shapeRenderer;
     Game main;
+    int scene=0;
     int currentColorToCollect;
+    int playerTex;
+    PlayerMove move;
+    Timer timer;
+    int score=0;
+    float second=0;
+    int minute=0;
+    Text scoreText;
+    Text timeText;
+    DecimalFormat df = new DecimalFormat("##");
 
     Sprite backgroundTextureSprite;
     float maxSpawnDistance = 12f;
@@ -53,27 +70,31 @@ public class Scene extends ScreenAdapter {
     public Scene(int tex, PlayerMove move,boolean game, Game main){
         this.game=game;
         this.main=main;
+        this.playerTex=tex;
+        this.move=move;
         batch=main.batch;
         camera.setToOrtho(false,6,4);
         camera.translate(new Vector2(-camera.viewportWidth/2,-camera.viewportHeight/2));
         camera.update();
+        fontCamera.setToOrtho(false,600,400);
+        fontCamera.translate(new Vector2(-camera.viewportWidth/2,-camera.viewportHeight/2));
+        fontCamera.update();
         world = new World(new Vector2(0, 0), true);
         if(game){
-            player=new Player(tex, new Vector2(0,0), this,world,camera,move);
+            //recreate(0);
+            move.scene=this;
         }
 
-        if(tex!=-1) {
-            background = new Texture("background.png");
-            background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-            backgroundTextureSprite = new Sprite(background, 0, 0, background.getWidth() * maxBackgroundWidth, background.getHeight() * maxBackgroundHeight);
-            backgroundTextureSprite.setPosition(-backgroundTextureSprite.getWidth() / 2, -backgroundTextureSprite.getHeight() / 2);
-
-            backgroundTextureSprite.setScale(0.01f);
-        }
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
                 if(contact.getFixtureA().getBody()==player.body||contact.getFixtureB().getBody()==player.body) {
+                    /*for (Food food:foods) {
+                        if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
+                            eaten=food;
+                            break;
+                        } }
+                    }*/
                     for (Food food:foods) {
                         if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
                             if (food.color == currentColorToCollect) {
@@ -83,6 +104,7 @@ public class Scene extends ScreenAdapter {
                                     foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
                                     player.bodyParts.remove(player.bodyParts.size() - 1);
                                 }
+                                score--;
                                 foodsToDelete.add(food);
                                 foods.remove(food);
                             }
@@ -108,30 +130,41 @@ public class Scene extends ScreenAdapter {
             }
         });
 
-        if(player!=null) {
-            Timer timer = new Timer();
-            TimerTask colorChange = new TimerTask() {
-                public void run() {
-                    currentColorToCollect = randomInt(2, 7);
-                    player.changeColor(currentColorToCollect);
-                }
-            };
+        shapeRenderer=new ShapeRenderer();
+        miniScenes.add(new MiniScene(fontCamera));
 
-            timer.scheduleAtFixedRate(colorChange, 0, 15000);
-            player.color = currentColorToCollect;
-        }
+        scoreText=new Text("0",true,0,-300,190,0.1f, Align.left, 0.3f, 0.2f, Color.BLACK, main.font, fontCamera);
+        timeText=new Text("0:00",true,0,0,190,0.1f, Align.center, 0.3f, 0.2f, Color.BLACK, main.font, fontCamera);
+        //camera.zoom=5;
+        //fontCamera.zoom=5;
     }
 
     public void addFood(float posX,float posY){
         foods.add(new Food(new Vector2(posX, posY), this));
     }
 
+    @Override
+    public void render(float delta) {
+        second+=Gdx.graphics.getDeltaTime();
+        if(second>=60){
+            second-=60;
+            minute++;
+        }
+
+        batch.setProjectionMatrix(camera.combined);
+
+        Gdx.gl.glClearColor(1, 1, 1, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        draw(null);
+    }
+
     public void draw(Box2DDebugRenderer renderer){
         if(game) {
             move();
         }
-        batch.setProjectionMatrix(camera.combined);
 
+        batch.setProjectionMatrix(camera.combined);
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 
 
@@ -150,22 +183,22 @@ public class Scene extends ScreenAdapter {
             player.draw(batch);
         }
 
-
         batch.end();
+
+        batch.setProjectionMatrix(fontCamera.combined);
+        shapeRenderer.setProjectionMatrix(fontCamera.combined);
+
+        if(move!=null&&move.getClass()!=MenuMove.class&&scene==0) {
+            scoreText.original = score + "";
+            timeText.original = minute + ":" + df.format(second);
+            scoreText.draw(batch);
+            timeText.draw(batch);
+        }
+        miniScenes.get(scene).draw(batch, shapeRenderer);
 
         deleteBodies();
         //renderer.render(world,camera.combined);
 
-    }
-
-    @Override
-    public void render(float delta) {
-        batch.setProjectionMatrix(camera.combined);
-
-        Gdx.gl.glClearColor(1, 1, 1, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        draw(null);
     }
 
     void move(){
@@ -179,6 +212,7 @@ public class Scene extends ScreenAdapter {
         if (foods.size() < 20) {
             addFood();
         }
+
 
         backgroundMover();
     }
@@ -197,6 +231,7 @@ public class Scene extends ScreenAdapter {
         float randomNum = random.nextFloat() * (max - min)+  min;
 
         return randomNum;
+
     }
 
     public static float[] sortArray(float[] sectorWeightArray) {
@@ -279,18 +314,27 @@ public class Scene extends ScreenAdapter {
     }
 
     void deleteBodies() {
-        for (Food food : foodsToDelete) {
-            world.destroyBody(food.body);
-            break;
+        if(score>0) {
+            player.zoomChanger.newTime(camera.zoom - 1f / player.bodyParts.size() / 10);
+        }
+        for (int i = 0; i < foodsToDelete.size(); i++) {
+            world.destroyBody(foodsToDelete.get(i).body);
         }
         foodsToDelete.clear();
     }
 
+//    public void foodDelete() {
+//        for (Food food:foods) {
+//            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y) {
+//                food.destroy();
+//                break;
+//            }
+//        }
+//    }
 
     public void foodDelete() {
         for (Food food:foods) {
-            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y ||
-                    food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
+            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y || food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
                 foodsToDelete.add(food);
                 foods.remove(food);
                 break;
@@ -317,5 +361,60 @@ public class Scene extends ScreenAdapter {
 
     public void addGameObject(GameObject object){
         gameObjects.add(object);
+    }
+
+    public void addButton(int miniScene, String texName, String text, float rotation, float X, float Y, float sX, float sY,int type, int shape, int action, int which, Color col){
+        miniScenes.get(miniScene).buttons.add(new Button(texName,text,rotation,X,Y,sX,sY,type,shape,action,which, col,main,this));
+    }
+
+    public void addMiniScene(){
+        miniScenes.add(new MiniScene(fontCamera));
+    }
+
+    public void set(int i){
+        scene=i;
+    }
+    void recreate(int i){
+        if(game) {
+            player = new Player(i, new Vector2(0, 0), this, world, camera, move);
+            timer = new Timer();
+            TimerTask colorChange = new TimerTask() {
+                public void run() {
+                    currentColorToCollect = randomInt(2, player.colors.length-1);
+                    player.changeColor(currentColorToCollect);
+                }
+            };
+
+            timer.scheduleAtFixedRate(colorChange, 0, 15000);
+            player.playerColor = player.colors[currentColorToCollect].cpy();
+            setBackground(i);
+            scene = 0;
+        }
+    }
+    void empty(){
+        if(game) {
+            score=0;
+            for (int i = 0; i < foods.size(); i++) {
+                foods.get(i).destroy();
+            }
+            if(player!=null) {
+                player.destroy();
+            }if(timer!=null) {
+                timer.cancel();
+            }
+        }
+        camera.zoom=1;
+    }
+    void setBackground(int i){
+
+        background = new Texture(backgrounds[i]);
+        background.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+        backgroundTextureSprite = new Sprite(background, 0, 0, background.getWidth() * maxBackgroundWidth, background.getHeight() * maxBackgroundHeight);
+        backgroundTextureSprite.setPosition(-backgroundTextureSprite.getWidth() / 2, -backgroundTextureSprite.getHeight() / 2);
+
+        backgroundTextureSprite.setScale(0.01f);
+    }
+    void addText(int miniScene, String texName, String text, float rotation, float X, float Y, float sX, float sY,int type, int shape, int action, int which, Color col){
+        miniScenes.get(miniScene).texts.add(new Text("",true,0,0,0,1, Align.center, 1, 1, Color.BLACK, main.font, camera));
     }
 }

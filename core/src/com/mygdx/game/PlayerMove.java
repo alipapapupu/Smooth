@@ -12,9 +12,10 @@ import java.text.DecimalFormat;
 
 class PlayerMove{
     Vector2 zeroPoint = Vector2.Zero;
+    Scene scene;
     final float radiusX = 0.6f;
     final float radiusY = 0.5f;
-    final float speed = 10;
+    final float speed = 6;
     final float error = 0.01f;
     final int SIZE = 2;
     final float MAX = 3;
@@ -23,7 +24,7 @@ class PlayerMove{
     Vector2 direction;
     float[] maxBorder = new float[]{0, 0, 0, 0};
     float[] testBorder=new float[]{0,0,0,0};
-    Vector2[] average=new Vector2[]{new Vector2(0,0),new Vector2(0,0),new Vector2(0,0),new Vector2(0,0),new Vector2(0,0)};
+    Vector2[] average=new Vector2[5];
     
     Game game;
     GameObject center;
@@ -43,6 +44,9 @@ class PlayerMove{
             for (int o = 0; o < allBorder[i].length; o++) {
                 allBorder[i][o] = 0;
             }
+        }
+        for(int i = 0; i < average.length; i++){
+            average[i]=new Vector2(0,0);
         }
 
     }
@@ -115,7 +119,7 @@ class PlayerMove{
         }
         position.x *= speed;
         position.y *= speed;
-        return position;
+        return regulate(position);
     }
 
     public float getRotation() {
@@ -141,14 +145,14 @@ class PlayerMove{
         }
         point = ave;
     }
-    public float getRotation(Vector2 position, Vector2 newPos, float size, float rotation) {
-        float rot=MathUtils.degreesToRadians*(rotation+180);
-        Vector2 connectPoint=new Vector2(size*MathUtils.cos(rot) +newPos.x,size*MathUtils.sin(rot) +newPos.y);
-        return MathUtils.atan2(position.y-connectPoint.y, position.x+size-connectPoint.x);
-    }
-    Vector2 getPosition(Vector2 newPos, float size, float rotation){
-        float rot=MathUtils.degreesToRadians*(rotation+180);
-        return new Vector2(size*MathUtils.cos(rot) +newPos.x-size,size*MathUtils.sin(rot) +newPos.y);
+
+    Vector2 regulate(Vector2 position){
+        double distance=Math.hypot(position.x,position.y);
+        if(distance>speed) {
+            Vector2 relation = new Vector2((float) (position.x/distance), (float) (position.y/distance));
+            return new Vector2(relation.x*speed, relation.y*speed);
+        }
+        return position;
     }
 
     public void test(){

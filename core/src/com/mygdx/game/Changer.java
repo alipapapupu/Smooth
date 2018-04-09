@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -8,8 +9,8 @@ import com.badlogic.gdx.math.MathUtils;
  */
 
 public class Changer {
-    float zoomTime;
-    int maxZoomTime;
+    float time;
+    int maxTime;
     float fromZoom;
     float zoom;
     float toZoom;
@@ -24,8 +25,8 @@ public class Changer {
         this.zoom=zoom;
         toZoom=zoom;
 
-        zoomTime=newZoomTime;
-        maxZoomTime=newZoomTime;
+        time=newZoomTime;
+        maxTime=newZoomTime;
         mode=0;
     }
     Changer(Color color, int newZoomTime){
@@ -33,28 +34,29 @@ public class Changer {
         this.color=color;
         toColor=color;
 
-        zoomTime=newZoomTime;
-        maxZoomTime=newZoomTime;
+        time=newZoomTime;
+        maxTime=newZoomTime;
         mode=1;
     }
     void newTime(float newZoom){
         toZoom=newZoom;
-        zoomTime=0;
+        time=0;
     }
     void newTime(Color newColor){
         toColor=newColor;
-        zoomTime=0;
+        time=0;
     }
     void next(){
-        if(zoomTime<=maxZoomTime){
+        if(time<=maxTime){
             if(mode==0) {
-                fromZoom = MathUtils.lerp(fromZoom, toZoom, zoomTime / maxZoomTime);
+                fromZoom = MathUtils.lerp(fromZoom, toZoom, time / maxTime);
+
             }else if(mode==1){
                 Color backup=fromColor;
-                color=fromColor.lerp(toColor,zoomTime/maxZoomTime);
+                color=fromColor.lerp(toColor,time/maxTime);
                 fromColor=backup;
             }
-            zoomTime++;
+            time++;
         }
     }
 }

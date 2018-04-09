@@ -16,14 +16,15 @@ public class Food extends GameObject{
     Vector2 end;
     Vector2 start;
     Vector2 direcion;
+    float density;
     Food(Vector2 position, Scene scene){
         super(null,0.001f,0.001f, -1,position,scene);
         createBody(size,true);
+        density=body.getFixtureList().first().getDensity();
         rotationSpeed=(float)(Math.random()*10-5);
         start=newDirection();
         end=start;
         direcion=new Vector2(0,0);
-
     }
     public void move(){
         body.setAngularVelocity(rotationSpeed);
@@ -37,8 +38,9 @@ public class Food extends GameObject{
             direcion.y=MathUtils.lerp(start.y,end.y,time/maxTime);
         }
         body.applyForceToCenter(direcion, true);
+        position=body.getPosition();
     }
     Vector2 newDirection(){
-        return new Vector2((float)(Math.random()*1-0.5),(float)(Math.random()*1-0.5));
+        return new Vector2((float)(Math.random()*1-0.5)*density,(float)(Math.random()*1-0.5)*density);
     }
 }

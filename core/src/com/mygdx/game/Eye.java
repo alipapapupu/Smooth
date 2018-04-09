@@ -1,6 +1,9 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -8,24 +11,43 @@ import com.badlogic.gdx.math.Vector2;
  */
 
 public class Eye extends GameObject {
-    public Eye(String name,float width, float height, int color, Vector2 position, Scene scene){
+    boolean theEye;
+    final float UPLIMIT=5;
+    final float DOWNLIMIT=-5;
+    public Eye(String name,float width, float height, int color, Vector2 position, Scene scene,boolean theEye){
         super(new Texture(name),width,height,color,position,scene);
 
+        this.theEye=theEye;
         createBody(size,true);
     }
     public void move(){
-        double distance=1000;
-        Vector2 relation=Vector2.Zero;
-        for (Food food:scene.foods) {
-            if(food.color==scene.currentColorToCollect){
-                if(distance>Math.abs(Math.hypot(position.x-food.position.x,position.y-food.position.y))) {
-                    distance=Math.hypot(position.x-food.position.x,position.y-food.position.y);
-                    relation = new Vector2((float) (distance / food.position.x), (float) (distance / food.position.y));
+        if(theEye) {
+            float distance = 1000;
+            Vector2 relation = Vector2.Zero;
+            for (Food food : scene.foods) {
+                if (food.color == scene.currentColorToCollect) {
+                    float foodDistance=(float)Math.hypot(food.position.x-scene.player.position.x, food.position.y-scene.player.position.y);
+                    if (distance > foodDistance) {
+                        distance = foodDistance;
+                        relation = new Vector2((food.position.x-scene.player.position.x) / distance, (food.position.y-scene.player.position.y) / distance);
+                    }
                 }
             }
+            if (distance != 1000) {
+                body.setLinearVelocity(new Vector2(relation.x, relation.y));
+            }
         }
-        if(distance!=1000){
-            body.setLinearVelocity(new Vector2(relation.x, relation.y));
+    }
+    public void draw(SpriteBatch batch){
+        batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+    }
+    float rotate(float angle){
+
+        float newAngle=(body.getAngle()-angle)*MathUtils.radiansToDegrees;
+        if(newAngle>UPLIMIT||newAngle<DOWNLIMIT){
+            body.setTransform(body.getPosition(),MathUtils.clamp(newAngle,DOWNLIMIT,UPLIMIT)*MathUtils.degreesToRadians+angle);
+            body.setAngularVelocity(0);
         }
+        return body.getAngle();
     }
 }
