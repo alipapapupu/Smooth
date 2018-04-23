@@ -10,14 +10,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Align;
 
 import java.text.DecimalFormat;
@@ -50,6 +48,7 @@ public class Scene extends ScreenAdapter {
     Game main;
     int scene=0;
     int currentColorToCollect;
+    int currentShapeToCollect;
     int playerTex;
     PlayerMove move;
     Timer timer;
@@ -59,6 +58,12 @@ public class Scene extends ScreenAdapter {
     Text scoreText;
     Text timeText;
     DecimalFormat df = new DecimalFormat("##");
+
+    boolean gameModeColor = false;
+    boolean gameModeShape = true;
+
+    int formerColorToCollect;
+    int formerShapeToCollect;
 
     Sprite backgroundTextureSprite;
     float maxSpawnDistance = 12f;
@@ -97,16 +102,30 @@ public class Scene extends ScreenAdapter {
                     }*/
                     for (Food food:foods) {
                         if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
-                            if (food.color == currentColorToCollect) {
-                                eaten=food;
-                            } else {
-                                if (player.bodyParts.size() > 0) {
-                                    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
-                                    player.bodyParts.remove(player.bodyParts.size() - 1);
+                            if (gameModeColor) {
+                                if (food.color == currentColorToCollect) {
+                                    eaten = food;
+                                } else {
+                                    //if (player.bodyParts.size() > 0) {
+                                    //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                    //    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                    //}
+                                    score--;
+                                    foodsToDelete.add(food);
+                                    foods.remove(food);
                                 }
-                                score--;
-                                foodsToDelete.add(food);
-                                foods.remove(food);
+                            } else if (gameModeShape) {
+                                if (food.shape == currentShapeToCollect) {
+                                    eaten = food;
+                                } else {
+                                    //if (player.bodyParts.size() > 0) {
+                                    //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                    //    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                    //}
+                                    score--;
+                                    foodsToDelete.add(food);
+                                    foods.remove(food);
+                                }
                             }
                             break;
                         }
@@ -167,6 +186,7 @@ public class Scene extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 
+        batch.setColor(Color.WHITE);
 
         batch.setColor(Color.WHITE);
         batch.begin();
@@ -324,15 +344,6 @@ public class Scene extends ScreenAdapter {
         foodsToDelete.clear();
     }
 
-//    public void foodDelete() {
-//        for (Food food:foods) {
-//            if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y) {
-//                food.destroy();
-//                break;
-//            }
-//        }
-//    }
-
     public void foodDelete() {
         for (Food food:foods) {
             if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y || food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
@@ -375,14 +386,27 @@ public class Scene extends ScreenAdapter {
     public void set(int i){
         scene=i;
     }
+
     void recreate(int i){
         if(game) {
             player = new Player(i, new Vector2(0, 0), this, world, camera, move);
             timer = new Timer();
             TimerTask colorChange = new TimerTask() {
                 public void run() {
-                    currentColorToCollect = randomInt(2, player.colors.length-1);
-                    player.changeColor(currentColorToCollect);
+                    if (gameModeColor) {
+                        while (currentColorToCollect == formerColorToCollect) {
+                            currentColorToCollect = randomInt(2, player.colors.length - 1);
+                        }
+
+                        formerColorToCollect = currentColorToCollect;
+                        player.changeColor(currentColorToCollect);
+                    } else if (gameModeShape) {
+                        while (currentShapeToCollect == formerShapeToCollect) {
+                            currentShapeToCollect = randomInt(0, player.textures.length - 1);
+                        }
+
+                        formerShapeToCollect = currentShapeToCollect;
+                    }
                 }
             };
 
@@ -392,6 +416,7 @@ public class Scene extends ScreenAdapter {
             scene = 0;
         }
     }
+
     void empty(){
         if(game) {
             score=0;
