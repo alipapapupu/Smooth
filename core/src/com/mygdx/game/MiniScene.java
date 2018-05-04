@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class MiniScene {
     ArrayList<Button> buttons=new ArrayList<Button>();
     ArrayList<Text> texts=new ArrayList<Text>();
+    ArrayList<Object> images=new ArrayList<Object>();
     OrthographicCamera camera;
 
     MiniScene (OrthographicCamera camera){
@@ -28,6 +29,9 @@ public class MiniScene {
         }
         for(Text text : texts){
             text.draw(batch);
+        }
+        for(Object object:images){
+            object.draw(batch);
         }
     }
 }

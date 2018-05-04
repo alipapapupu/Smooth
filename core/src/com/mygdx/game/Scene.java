@@ -38,7 +38,7 @@ public class Scene extends ScreenAdapter {
     //ArrayList<Enemy> enemies=new ArrayList<Enemy>();
     World world;
     Texture background;
-    String[] backgrounds=new String[]{"background.png","calibration.png"};
+    String[] backgrounds=new String[]{"background.png","background2.png","background3.png","calibration.png"};
     OrthographicCamera camera=new OrthographicCamera();
     OrthographicCamera fontCamera=new OrthographicCamera();
     Random random = new Random();
@@ -59,8 +59,7 @@ public class Scene extends ScreenAdapter {
     Text timeText;
     DecimalFormat df = new DecimalFormat("##");
 
-    boolean gameModeColor = false;
-    boolean gameModeShape = true;
+    int gameMode=0;
 
     int formerColorToCollect;
     int formerShapeToCollect;
@@ -71,6 +70,7 @@ public class Scene extends ScreenAdapter {
     int maxBackgroundWidth = 4;
     int maxBackgroundHeight = 4;
 
+    boolean calibration=false;
 
     public Scene(int tex, PlayerMove move,boolean game, Game main){
         this.game=game;
@@ -102,8 +102,8 @@ public class Scene extends ScreenAdapter {
                     }*/
                     for (Food food:foods) {
                         if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
-                            if (gameModeColor) {
-                                if (food.color == currentColorToCollect) {
+                            if (gameMode==0) {
+                                if (food.colorNumber == currentColorToCollect) {
                                     eaten = food;
                                 } else {
                                     //if (player.bodyParts.size() > 0) {
@@ -114,8 +114,21 @@ public class Scene extends ScreenAdapter {
                                     foodsToDelete.add(food);
                                     foods.remove(food);
                                 }
-                            } else if (gameModeShape) {
+                            }
+                            else if (gameMode==1) {
                                 if (food.shape == currentShapeToCollect) {
+                                    eaten = food;
+                                } else {
+                                    //if (player.bodyParts.size() > 0) {
+                                    //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                    //    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                    //}
+                                    score--;
+                                    foodsToDelete.add(food);
+                                    foods.remove(food);
+                                }
+                            }else if(gameMode==2){
+                                if (food.colorNumber == currentColorToCollect&&food.shape == currentShapeToCollect) {
                                     eaten = food;
                                 } else {
                                     //if (player.bodyParts.size() > 0) {
@@ -186,10 +199,8 @@ public class Scene extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 
-        batch.setColor(Color.WHITE);
-
-        batch.setColor(Color.WHITE);
         batch.begin();
+        batch.setColor(Color.WHITE);
         if(background!=null) {
             backgroundTextureSprite.draw(batch);
         }
@@ -337,7 +348,14 @@ public class Scene extends ScreenAdapter {
     void deleteBodies() {
         if(score>0) {
             player.zoomChanger.newTime(camera.zoom - 1f / player.bodyParts.size() / 10);
+        }else if(score<0){
+            score=0;
         }
+        /*if(player.bodyParts.size()>=30){
+            player.over=true;
+            player.exit.fromZoom=camera.zoom;
+            player.exit.newTime(camera.zoom+10);
+        }*/ 
         for (int i = 0; i < foodsToDelete.size(); i++) {
             world.destroyBody(foodsToDelete.get(i).body);
         }
@@ -378,6 +396,12 @@ public class Scene extends ScreenAdapter {
     public void addButton(int miniScene, String texName, String text, float rotation, float X, float Y, float sX, float sY,int type, int shape, int action, int which, Color col){
         miniScenes.get(miniScene).buttons.add(new Button(texName,text,rotation,X,Y,sX,sY,type,shape,action,which, col,main,this));
     }
+    void addText(int miniScene, String texName, String text, float rotation, float X, float Y, float sX,float sY, Color col){
+        miniScenes.get(miniScene).texts.add(new Text(text,true,rotation,X,Y,1, Align.center, sX, sY, col, main.font, fontCamera));
+    }
+    void addImage(int miniScene, String texName, float rotation, float x, float y, float sX, float sY,Color col){
+        miniScenes.get(miniScene).images.add(new Object(texName,rotation,x,y,sX,sY,col,fontCamera));
+    }
 
     public void addMiniScene(){
         miniScenes.add(new MiniScene(fontCamera));
@@ -391,26 +415,29 @@ public class Scene extends ScreenAdapter {
         if(game) {
             player = new Player(i, new Vector2(0, 0), this, world, camera, move);
             timer = new Timer();
+            gameMode=i;
             TimerTask colorChange = new TimerTask() {
                 public void run() {
-                    if (gameModeColor) {
+                    if (gameMode!=1) {
                         while (currentColorToCollect == formerColorToCollect) {
                             currentColorToCollect = randomInt(2, player.colors.length - 1);
                         }
 
                         formerColorToCollect = currentColorToCollect;
                         player.changeColor(currentColorToCollect);
-                    } else if (gameModeShape) {
+                    } if (gameMode!=0) {
                         while (currentShapeToCollect == formerShapeToCollect) {
                             currentShapeToCollect = randomInt(0, player.textures.length - 1);
                         }
 
                         formerShapeToCollect = currentShapeToCollect;
+                        player.changeShape(currentShapeToCollect);
                     }
                 }
             };
 
-            timer.scheduleAtFixedRate(colorChange, 0, 15000);
+            timer.scheduleAtFixedRate(colorChange, 0, 30000);
+            Gdx.app.log(currentColorToCollect+"",player.colors[currentColorToCollect]+"");
             player.playerColor = player.colors[currentColorToCollect].cpy();
             setBackground(i);
             scene = 0;
@@ -439,8 +466,5 @@ public class Scene extends ScreenAdapter {
         backgroundTextureSprite.setPosition(-backgroundTextureSprite.getWidth() / 2, -backgroundTextureSprite.getHeight() / 2);
 
         backgroundTextureSprite.setScale(0.01f);
-    }
-    void addText(int miniScene, String texName, String text, float rotation, float X, float Y, float sX, float sY,int type, int shape, int action, int which, Color col){
-        miniScenes.get(miniScene).texts.add(new Text("",true,0,0,0,1, Align.center, 1, 1, Color.BLACK, main.font, camera));
     }
 }

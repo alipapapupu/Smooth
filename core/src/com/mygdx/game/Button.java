@@ -20,12 +20,9 @@ public class Button extends Object {
     int which;
     Text text;
     Game game;
-    OrthographicCamera camera;
-    Vector2 startPosition;
     Scene scene;
     public Button(String tex, String text, float rotation, float x, float y, float sX, float sY, int type, int shape, int action, int which, Color color, Game game,Scene scene) {
-        super(tex, rotation, x, y, sX, sY, color);
-        camera = scene.fontCamera;
+        super(tex, rotation, x, y, sX, sY, color,scene.fontCamera);
         size = new Vector2(sX, sY);
         this.shape = shape;
         this.type = type;
@@ -33,14 +30,13 @@ public class Button extends Object {
         this.game = game;
         this.which = which;
         this.scene = scene;
-        startPosition = position;
         if (text !=null) {
             this.text = new Text(text, false, 0, position.x - size.x / 2, position.y, size.x, Align.center, size.x / 380, size.y / 380, Color.BLACK, game.font, camera);
         }
     }
 
     public void draw(ShapeRenderer rend){
-        position=new Vector2(startPosition.x+camera.position.x,startPosition.y+camera.position.y);
+        updatePos();
         rend.begin(ShapeRenderer.ShapeType.Filled);
         rend.setColor(color);
         switch (shape) {

@@ -25,7 +25,7 @@ public class MenuMove extends PlayerMove {
         float distance = 1000;
         Vector2 relation = Vector2.Zero;
         for (Food food : scene.foods) {
-            if (food.color == scene.currentColorToCollect) {
+            if ((scene.gameMode==0&&food.colorNumber == scene.currentColorToCollect)||(scene.gameMode==1&&food.shape==scene.currentShapeToCollect)||(scene.gameMode==2&&food.shape==scene.currentShapeToCollect&&scene.currentColorToCollect==food.colorNumber)) {
                 float foodDistance=(float)Math.hypot(food.position.x-scene.player.position.x, food.position.y-scene.player.position.y);
                 if (distance > foodDistance) {
                     distance = foodDistance;

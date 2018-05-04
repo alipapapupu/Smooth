@@ -14,6 +14,9 @@ public class Eye extends GameObject {
     boolean theEye;
     final float UPLIMIT=5;
     final float DOWNLIMIT=-5;
+    final float SPEED=2;
+    Vector2 difference;
+    boolean mover=false;
     public Eye(String name,float width, float height, int color, Vector2 position, Scene scene,boolean theEye){
         super(new Texture(name),width,height,color,position,scene);
 
@@ -25,7 +28,7 @@ public class Eye extends GameObject {
             float distance = 1000;
             Vector2 relation = Vector2.Zero;
             for (Food food : scene.foods) {
-                if (food.color == scene.currentColorToCollect) {
+                if ((scene.gameMode==0&&food.colorNumber == scene.currentColorToCollect)||(scene.gameMode==1&&food.shape==scene.currentShapeToCollect)||(scene.gameMode==2&&food.shape==scene.currentShapeToCollect&&scene.currentColorToCollect==food.colorNumber)) {
                     float foodDistance=(float)Math.hypot(food.position.x-scene.player.position.x, food.position.y-scene.player.position.y);
                     if (distance > foodDistance) {
                         distance = foodDistance;
@@ -34,20 +37,11 @@ public class Eye extends GameObject {
                 }
             }
             if (distance != 1000) {
-                body.setLinearVelocity(new Vector2(relation.x, relation.y));
+                body.setLinearVelocity(new Vector2(relation.x*SPEED, relation.y*SPEED).add(scene.player.body.getLinearVelocity().x/2,scene.player.body.getLinearVelocity().y/2));
             }
         }
     }
     public void draw(SpriteBatch batch){
         batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
-    }
-    float rotate(float angle){
-
-        float newAngle=(body.getAngle()-angle)*MathUtils.radiansToDegrees;
-        if(newAngle>UPLIMIT||newAngle<DOWNLIMIT){
-            body.setTransform(body.getPosition(),MathUtils.clamp(newAngle,DOWNLIMIT,UPLIMIT)*MathUtils.degreesToRadians+angle);
-            body.setAngularVelocity(0);
-        }
-        return body.getAngle();
     }
 }

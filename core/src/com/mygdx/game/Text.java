@@ -23,19 +23,15 @@ class Text extends Object{
     int align;
     GlyphLayout layout;
     boolean format=false;
-    OrthographicCamera camera;
     int more=0;
-    Vector2 originPosition;
     String original;
     public Text(String text, boolean format, float rotation, float x, float y, float width, int align, float sX, float sY, Color color, BitmapFont font,OrthographicCamera camera){
-        super(null,rotation,x,y,sX,sY,color);
+        super(null,rotation,x,y,sX,sY,color,camera);
 
-        this.camera=camera;
         this.format=format;
         size=new Vector2(sX,sY);
         this.text=text;
         original=text;
-        originPosition=position;
         this.font=font;
         this.width=width;
         this.align=align;
@@ -45,7 +41,7 @@ class Text extends Object{
     @Override
     public void draw(SpriteBatch batch){
         boolean drawing=false;
-        position=new Vector2(originPosition.x+camera.position.x,originPosition.y+camera.position.y);
+        updatePos();
         if(!batch.isDrawing()) {
             drawing=true;
             batch.begin();

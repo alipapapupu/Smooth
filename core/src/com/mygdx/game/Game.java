@@ -53,7 +53,7 @@ public class Game extends com.badlogic.gdx.Game {
 
     @Override
     public void create () {
-        accelerometer=true;
+        accelerometer=false;
         batch = new SpriteBatch();
         font=new BitmapFont(Gdx.files.internal("fonts//font.txt"));
         PlayerMove movement;
@@ -66,8 +66,13 @@ public class Game extends com.badlogic.gdx.Game {
         }
         scenes[0]=new Scene(0,new MenuMove(center,this),true,this);
         scenes[0].addMiniScene();
+        scenes[0].addMiniScene();
         scenes[0].addButton(0,null,"START",0,0.2f,-100f,150,50,0, Button.BOX,1,1,Color.GREEN);
-        scenes[0].addButton(1,null,"New Game",0,0.2f,100f,150,50,0, Button.BOX,0,1,Color.GREEN);
+        scenes[0].addImage(0,"title.png",0,0,130,1,1,Color.WHITE);
+        scenes[0].addButton(1,null,"New Game",0,0.2f,100f,150,50,0, Button.BOX,1,2,Color.GREEN);
+        scenes[0].addButton(2, null, "Game 1",0,-200,0,150,50,0,Button.BOX,0,1,Color.GREEN);
+        scenes[0].addButton(2, null, "Game 2",0,0,0,150,50,0,Button.BOX,0,2,Color.GREEN);
+        scenes[0].addButton(2, null, "Game 3",0,200,0,150,50,0,Button.BOX,0,3,Color.GREEN);
 
         scenes[1]=new Scene(0,movement,true,this);
         scenes[1].addMiniScene();

@@ -38,12 +38,24 @@ public class Changer {
         maxTime=newZoomTime;
         mode=1;
     }
+    Changer(int newZoomTime){
+        fromZoom=1;
+        zoom=1;
+        toZoom=-1;
+
+        time=newZoomTime;
+        maxTime=newZoomTime;
+        mode=2;
+    }
     void newTime(float newZoom){
         toZoom=newZoom;
         time=0;
     }
     void newTime(Color newColor){
         toColor=newColor;
+        time=0;
+    }
+    void newTime(){
         time=0;
     }
     void next(){
@@ -55,6 +67,8 @@ public class Changer {
                 Color backup=fromColor;
                 color=fromColor.lerp(toColor,time/maxTime);
                 fromColor=backup;
+            }else if(mode==2){
+                zoom=Math.abs(MathUtils.lerp(fromZoom,toZoom,time/maxTime));
             }
             time++;
         }

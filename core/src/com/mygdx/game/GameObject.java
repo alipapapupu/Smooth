@@ -26,14 +26,16 @@ abstract class GameObject {
     Vector2 size;
     int shape;
     Texture sprite;
-    int color;
+    Color color;
     float rotation;
     Body body;
     Filter filter;
     String[] textures=new String[]{"circle.png","square.png","triangle.png","diamond.png"};
     int type;
+    float indicatorSize=1;
 
-    Color[] colors=new Color[]{Color.WHITE,Color.BLACK,Color.BLUE,Color.BROWN,Color.RED,Color.YELLOW,Color.ORANGE,Color.PINK,Color.PURPLE};
+    int colorNumber;
+    Color[] colors=new Color[]{Color.WHITE,Color.BLACK,Color.BLUE,Color.BROWN,Color.RED,Color.YELLOW,Color.PINK};
 
     public GameObject(Texture tex, float width, float height,int color, Vector2 position, Scene scene){
         if(tex==null){
@@ -47,11 +49,12 @@ abstract class GameObject {
         }
 
         if(color==-1){
-            this.color=randomColor();
+            colorNumber=randomColor();
         }else {
-            this.color = color;
+            colorNumber = color;
         }
 
+        this.color=colors[colorNumber].cpy();
         this.scene=scene;
         bounds=new Vector2(scene.camera.viewportWidth/2,scene.camera.viewportHeight/2);
         this.position=position;
@@ -98,9 +101,9 @@ abstract class GameObject {
 
     void draw(SpriteBatch batch){
         Color backup=batch.getColor();
-        batch.setColor(colors[color]);
+        batch.setColor(color);
         if(body==null){
-            batch.draw(sprite, position.x - size.x / 2, position.y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+            batch.draw(sprite, position.x - size.x / 2*indicatorSize, position.y - size.y / 2*indicatorSize, size.x / 2*indicatorSize, size.y / 2*indicatorSize, size.x*indicatorSize, size.y*indicatorSize, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
         }else {
             batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
         }
@@ -128,5 +131,8 @@ abstract class GameObject {
 
         }
         scene.world.destroyBody(body);
+    }
+    public void setSize(float newSize){
+        size=new Vector2(size.x*newSize,size.y*newSize);
     }
 }
