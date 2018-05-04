@@ -14,7 +14,7 @@ public class Eye extends GameObject {
     boolean theEye;
     final float UPLIMIT=5;
     final float DOWNLIMIT=-5;
-    final float SPEED=2;
+    final float SPEED=4;
     Vector2 difference;
     boolean mover=false;
     public Eye(String name,float width, float height, int color, Vector2 position, Scene scene,boolean theEye){

@@ -84,103 +84,104 @@ public class Scene extends ScreenAdapter {
         fontCamera.setToOrtho(false,600,400);
         fontCamera.translate(new Vector2(-camera.viewportWidth/2,-camera.viewportHeight/2));
         fontCamera.update();
-        world = new World(new Vector2(0, 0), true);
         if(game){
             //recreate(0);
             move.scene=this;
-        }
-
-        world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                if(contact.getFixtureA().getBody()==player.body||contact.getFixtureB().getBody()==player.body) {
+            world = new World(new Vector2(0, 0), true);
+            world.setContactListener(new ContactListener() {
+                @Override
+                public void beginContact(Contact contact) {
+                    if(contact.getFixtureA().getBody()==player.body||contact.getFixtureB().getBody()==player.body) {
                     /*for (Food food:foods) {
                         if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
                             eaten=food;
                             break;
                         } }
                     }*/
-                    for (Food food:foods) {
-                        if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
-                            if (gameMode==0) {
-                                if (food.colorNumber == currentColorToCollect) {
-                                    eaten = food;
-                                } else {
-                                    //if (player.bodyParts.size() > 0) {
-                                    //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
-                                    //    player.bodyParts.remove(player.bodyParts.size() - 1);
-                                    //}
-                                    score--;
-                                    foodsToDelete.add(food);
-                                    foods.remove(food);
+                        for (Food food:foods) {
+                            if (contact.getFixtureA().getBody() == food.body || contact.getFixtureB().getBody() == food.body) {
+                                if (gameMode==0) {
+                                    if (food.colorNumber == currentColorToCollect) {
+                                        eaten = food;
+                                    } else {
+                                        //if (player.bodyParts.size() > 0) {
+                                        //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                        //    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                        //}
+                                        score--;
+                                        foodsToDelete.add(food);
+                                        foods.remove(food);
+                                    }
                                 }
+                                else if (gameMode==1) {
+                                    if (food.shape == currentShapeToCollect) {
+                                        eaten = food;
+                                    } else {
+                                        //if (player.bodyParts.size() > 0) {
+                                        //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                        //    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                        //}
+                                        score--;
+                                        foodsToDelete.add(food);
+                                        foods.remove(food);
+                                    }
+                                }else if(gameMode==2){
+                                    if (food.colorNumber == currentColorToCollect&&food.shape == currentShapeToCollect) {
+                                        eaten = food;
+                                    } else {
+                                        //if (player.bodyParts.size() > 0) {
+                                        //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
+                                        //    player.bodyParts.remove(player.bodyParts.size() - 1);
+                                        //}
+                                        score--;
+                                        foodsToDelete.add(food);
+                                        //foods.remove(food);
+                                    }
+                                }
+                                break;
                             }
-                            else if (gameMode==1) {
-                                if (food.shape == currentShapeToCollect) {
-                                    eaten = food;
-                                } else {
-                                    //if (player.bodyParts.size() > 0) {
-                                    //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
-                                    //    player.bodyParts.remove(player.bodyParts.size() - 1);
-                                    //}
-                                    score--;
-                                    foodsToDelete.add(food);
-                                    foods.remove(food);
-                                }
-                            }else if(gameMode==2){
-                                if (food.colorNumber == currentColorToCollect&&food.shape == currentShapeToCollect) {
-                                    eaten = food;
-                                } else {
-                                    //if (player.bodyParts.size() > 0) {
-                                    //    foodsToDelete.add(player.bodyParts.get(player.bodyParts.size() - 1));
-                                    //    player.bodyParts.remove(player.bodyParts.size() - 1);
-                                    //}
-                                    score--;
-                                    foodsToDelete.add(food);
-                                    foods.remove(food);
-                                }
-                            }
-                            break;
                         }
                     }
                 }
-            }
 
-            @Override
-            public void endContact(Contact contact) {
+                @Override
+                public void endContact(Contact contact) {
 
-            }
+                }
 
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
+                @Override
+                public void preSolve(Contact contact, Manifold oldManifold) {
 
-            }
+                }
 
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
+                @Override
+                public void postSolve(Contact contact, ContactImpulse impulse) {
 
-            }
-        });
+                }
+            });
+            scoreText=new Text("0",true,0,-300,190,0.1f, Align.left, 0.3f, 0.2f, Color.BLACK, main.font, fontCamera);
+            timeText=new Text("0:00",true,0,0,190,0.1f, Align.center, 0.3f, 0.2f, Color.BLACK, main.font, fontCamera);
+        }
 
         shapeRenderer=new ShapeRenderer();
         miniScenes.add(new MiniScene(fontCamera));
 
-        scoreText=new Text("0",true,0,-300,190,0.1f, Align.left, 0.3f, 0.2f, Color.BLACK, main.font, fontCamera);
-        timeText=new Text("0:00",true,0,0,190,0.1f, Align.center, 0.3f, 0.2f, Color.BLACK, main.font, fontCamera);
         //camera.zoom=5;
         //fontCamera.zoom=5;
     }
 
     public void addFood(float posX,float posY){
-        foods.add(new Food(new Vector2(posX, posY), this));
+        foods.add(new Food(new Vector2(posX, posY),this));
     }
 
     @Override
     public void render(float delta) {
-        second+=Gdx.graphics.getDeltaTime();
-        if(second>=60){
-            second-=60;
-            minute++;
+        if(game) {
+            second += Gdx.graphics.getDeltaTime();
+            if (second >= 60) {
+                second -= 60;
+                minute++;
+            }
         }
 
         batch.setProjectionMatrix(camera.combined);
@@ -188,16 +189,17 @@ public class Scene extends ScreenAdapter {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        draw(null);
+        draw();
     }
 
-    public void draw(Box2DDebugRenderer renderer){
+    public void draw(){
         if(game) {
             move();
+            world.step(Gdx.graphics.getDeltaTime(), 6, 2);
+            deleteBodies();
         }
 
         batch.setProjectionMatrix(camera.combined);
-        world.step(Gdx.graphics.getDeltaTime(), 6, 2);
 
         batch.begin();
         batch.setColor(Color.WHITE);
@@ -228,7 +230,6 @@ public class Scene extends ScreenAdapter {
         }
         miniScenes.get(scene).draw(batch, shapeRenderer);
 
-        deleteBodies();
         //renderer.render(world,camera.combined);
 
     }
@@ -286,6 +287,13 @@ public class Scene extends ScreenAdapter {
     }
 
     public void addFood() {
+        Vector2 foodPosition=newFoodPosition();
+        foods.add(new Food(foodPosition,this));
+    }
+
+    public Vector2 newFoodPosition(){
+        Vector2 returner=new Vector2(0,0);
+
         float topRightSector = player.movement.maxBorder[1] + player.movement.maxBorder[0];
         float topLeftSector = Math.abs(player.movement.maxBorder[3]) + player.movement.maxBorder[0];
         float botRightSector = player.movement.maxBorder[1] + Math.abs(player.movement.maxBorder[2]);
@@ -304,45 +312,47 @@ public class Scene extends ScreenAdapter {
 
         if (randomInt > 6) {
             if (sortedSectorWeightArray[0] == topRightSector) {
-                foods.add(new Food(new Vector2(rightX, topY),this));
+                returner=new Vector2(rightX, topY);
             } else if (sortedSectorWeightArray[0] == topLeftSector) {
-                foods.add(new Food(new Vector2(leftX, topY),this));
+                returner=new Vector2(leftX, topY);
             } else if (sortedSectorWeightArray[0] == botRightSector) {
-                foods.add(new Food(new Vector2(rightX, botY),this));
+                returner=new Vector2(rightX, botY);
             } else if (sortedSectorWeightArray[0] == botLeftSector) {
-                foods.add(new Food(new Vector2(leftX, botY),this));
+                returner=new Vector2(leftX, botY);
             }
         } else if (randomInt > 3 && randomInt < 7) {
             if (sortedSectorWeightArray[1] == topRightSector) {
-                foods.add(new Food(new Vector2(rightX, topY),this));
+                returner=new Vector2(rightX, topY);
             } else if (sortedSectorWeightArray[1] == topLeftSector) {
-                foods.add(new Food(new Vector2(leftX, topY),this));
+                returner=new Vector2(leftX, topY);
             } else if (sortedSectorWeightArray[1] == botRightSector) {
-                foods.add(new Food(new Vector2(rightX, botY),this));
+                returner=new Vector2(rightX, botY);
             } else if (sortedSectorWeightArray[1] == botLeftSector) {
-                foods.add(new Food(new Vector2(leftX, botY),this));
+                returner=new Vector2(leftX, botY);
             }
         } else if (randomInt > 1 && randomInt < 4) {
             if (sortedSectorWeightArray[2] == topRightSector) {
-                foods.add(new Food(new Vector2(rightX, topY),this));
+                returner=new Vector2(rightX, topY);
             } else if (sortedSectorWeightArray[2] == topLeftSector) {
-                foods.add(new Food(new Vector2(leftX, topY),this));
+                returner=new Vector2(leftX, topY);
             } else if (sortedSectorWeightArray[2] == botRightSector) {
-                foods.add(new Food(new Vector2(rightX, botY),this));
+                returner=new Vector2(rightX, botY);
             } else if (sortedSectorWeightArray[2] == botLeftSector) {
-                foods.add(new Food(new Vector2(leftX, botY),this));
+                returner=new Vector2(leftX, botY);
             }
         } else {
             if (sortedSectorWeightArray[3] == topRightSector) {
-                foods.add(new Food(new Vector2(rightX, topY),this));
+                returner=new Vector2(rightX, topY);
             } else if (sortedSectorWeightArray[3] == topLeftSector) {
-                foods.add(new Food(new Vector2(leftX, topY),this));
+                returner=new Vector2(leftX, topY);
             } else if (sortedSectorWeightArray[3] == botRightSector) {
-                foods.add(new Food(new Vector2(rightX, botY),this));
+                returner=new Vector2(rightX, botY);
             } else if (sortedSectorWeightArray[3] == botLeftSector) {
-                foods.add(new Food(new Vector2(leftX, botY),this));
+                returner=new Vector2(leftX, botY);
             }
         }
+
+        return returner;
     }
 
     void deleteBodies() {
@@ -351,13 +361,14 @@ public class Scene extends ScreenAdapter {
         }else if(score<0){
             score=0;
         }
-        /*if(player.bodyParts.size()>=30){
+        if(player.bodyParts.size()>=30&&main.scene!=0){
             player.over=true;
             player.exit.fromZoom=camera.zoom;
             player.exit.newTime(camera.zoom+10);
-        }*/ 
+        }
         for (int i = 0; i < foodsToDelete.size(); i++) {
-            world.destroyBody(foodsToDelete.get(i).body);
+            //world.destroyBody(foodsToDelete.get(i).body);
+            foodsToDelete.get(i).foodReset();
         }
         foodsToDelete.clear();
     }

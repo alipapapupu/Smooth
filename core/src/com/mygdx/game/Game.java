@@ -39,6 +39,7 @@ import java.util.Random;
 
 public class Game extends com.badlogic.gdx.Game {
 
+    final int SPLASHSCENE=5;
     final int SETTINGSSCENE=4;
     final int CALIBRATIONSCENE=3;
     SpriteBatch batch;
@@ -46,9 +47,9 @@ public class Game extends com.badlogic.gdx.Game {
     Movement enemyMove;
     Movement foodMove;
     Box2DDebugRenderer render;
-    Scene[] scenes=new Scene[4];
+    Scene[] scenes=new Scene[6];
     int scene;
-    boolean calibrate=true;
+    boolean calibrate=false;
     BitmapFont font;
 
     @Override
@@ -86,15 +87,18 @@ public class Game extends com.badlogic.gdx.Game {
 
         scenes[CALIBRATIONSCENE].addGameObject("calibration.png",0.003f,0.003f,0,0,0);
         scenes[CALIBRATIONSCENE].addGameObject(center);
+
+        scenes[SPLASHSCENE]=new Splashscreen(this);
+
         render=new Box2DDebugRenderer();
-        set(0);
+        set(SPLASHSCENE);
     }
 
 	@Override
 	public void render () {
         super.render();
         if(calibrate){
-            scenes[CALIBRATIONSCENE].draw(render);
+            scenes[CALIBRATIONSCENE].draw();
         }
 	}
 	

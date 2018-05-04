@@ -43,4 +43,11 @@ public class Food extends GameObject{
     Vector2 newDirection(){
         return new Vector2((float)(Math.random()*1-0.5)*density,(float)(Math.random()*1-0.5)*density);
     }
+    void foodReset(){
+         position=scene.newFoodPosition();
+         body.setTransform(position,rotation);
+         newFoodTexture();
+         colorNumber=randomColor();
+         color=colors[colorNumber].cpy();
+    }
 }

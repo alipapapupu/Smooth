@@ -15,7 +15,7 @@ class PlayerMove{
     Scene scene;
     final float radiusX = 0.6f;
     final float radiusY = 0.5f;
-    final float speed = 5;
+    float speed = 5;
     final float error = 0.01f;
     final int SIZE = 2;
     final float MAX = 3;

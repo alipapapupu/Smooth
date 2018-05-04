@@ -10,12 +10,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +26,9 @@ import java.util.ArrayList;
 
 
 class Player extends GameObject{
+    float sumMass=0.1f;
+    float sumDamping=10;
+    Joint theJoint;
     Changer zoomChanger;
     Changer colorChanger;
     Changer shapeChanger;
@@ -45,10 +50,10 @@ class Player extends GameObject{
 
         this.scene=scene;
         this.camera=camera;
-        exit=new Changer(camera.zoom,1000);
+        exit=new Changer(camera.zoom,500);
         zoomChanger=new Changer(camera.zoom+1.2f,200);
         if(mode!=1) {
-            colorChanger = new Changer(colors[colorNumber].cpy(), 200);
+            colorChanger = new Changer(colors[colorNumber].cpy(), 50);
         }if(mode!=0) {
             indicator=new Food(position,scene);
             indicator.sprite=new Texture(indicator.textures[scene.currentShapeToCollect]);
@@ -101,7 +106,6 @@ class Player extends GameObject{
                 body.setAngularDamping(10);
                 body.setLinearDamping(10);
             }else{
-
                 otherBody = scene.world.createBody(bodyDef);
             }
         shape.dispose();
@@ -111,17 +115,16 @@ class Player extends GameObject{
         if(!over) {
             if (scene.eaten != null) {
                 Food eaten = scene.eaten;
-                GameObject object;
-
-                if (bodyParts.size() == 0) {
-                    object = this;
-                } else {
-                    object = bodyParts.get(bodyParts.size() - 1);
-                }
-                eaten.body.getFixtureList().first().setDensity(0.00000001f);
+                eaten.body.getFixtureList().first().setDensity(0.000001f);
                 eaten.body.resetMassData();
 
-                createJoint(object, eaten, 0, 0);
+
+                if(bodyParts.size()!=0) {
+                    scene.world.destroyJoint(theJoint);
+                    createJoint(eaten,bodyParts.get(bodyParts.size() - 1),0,0);
+                }
+                createJoint(this, eaten, 0, 0);
+
 
                 bodyParts.add(eaten);
                 scene.foods.remove(eaten);
@@ -129,6 +132,12 @@ class Player extends GameObject{
 
                 scene.score++;
                 zoomChanger.newTime(camera.zoom + 1f / bodyParts.size() / 10);
+                for (Food part:bodyParts) {
+                    part.body.getFixtureList().first().setDensity(sumMass/bodyParts.size());
+                    part.body.resetMassData();
+                    part.body.setLinearDamping(sumDamping/bodyParts.size());
+                    part.body.setAngularDamping(sumDamping/bodyParts.size());
+                }
             }
 
             zoomChanger.next();
@@ -226,7 +235,11 @@ class Player extends GameObject{
         joint.bodyB = object2.body;
         joint.localAnchorA.set(new Vector2(0+xDif, -object1.size.y / 2+yDif-Math.abs(xDif)));
         joint.localAnchorB.set(new Vector2(0, object2.size.y / 2));
-        scene.world.createJoint(joint);
+        if(object1.getClass()==Player.class){
+            theJoint=scene.world.createJoint(joint);
+        }else{
+            scene.world.createJoint(joint);
+        }
     }
     void createJoint(Body object1, Body object2, float xDif,float yDif){
         joint.bodyA = object1;

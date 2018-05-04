@@ -64,9 +64,11 @@ public class Changer {
                 fromZoom = MathUtils.lerp(fromZoom, toZoom, time / maxTime);
 
             }else if(mode==1){
-                Color backup=fromColor;
+                Color backup=fromColor.cpy();
                 color=fromColor.lerp(toColor,time/maxTime);
-                fromColor=backup;
+                if(time<maxTime) {
+                    fromColor=backup;
+                }
             }else if(mode==2){
                 zoom=Math.abs(MathUtils.lerp(fromZoom,toZoom,time/maxTime));
             }

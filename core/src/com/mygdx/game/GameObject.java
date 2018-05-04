@@ -29,7 +29,6 @@ abstract class GameObject {
     Color color;
     float rotation;
     Body body;
-    Filter filter;
     String[] textures=new String[]{"circle.png","square.png","triangle.png","diamond.png"};
     int type;
     float indicatorSize=1;
@@ -39,10 +38,7 @@ abstract class GameObject {
 
     public GameObject(Texture tex, float width, float height,int color, Vector2 position, Scene scene){
         if(tex==null){
-            int r=(int)(Math.random()*textures.length);
-            sprite=new Texture(textures[r]);
-            shape=r;
-            type=r+1;
+            newFoodTexture();
         }else {
             type=0;
             sprite = tex;
@@ -134,5 +130,12 @@ abstract class GameObject {
     }
     public void setSize(float newSize){
         size=new Vector2(size.x*newSize,size.y*newSize);
+    }
+
+    void newFoodTexture(){
+        int r=(int)(Math.random()*textures.length);
+        sprite=new Texture(textures[r]);
+        shape=r;
+        type=r+1;
     }
 }
