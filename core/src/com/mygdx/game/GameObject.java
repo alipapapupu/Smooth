@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -77,20 +78,20 @@ abstract class GameObject {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0.001f;
-        fixtureDef.friction = 0;
+        fixtureDef.density = 10;
+        fixtureDef.friction = 1;
+        body.setAngularDamping(10);
+        body.setLinearDamping(10);
 
         body.createFixture(fixtureDef);
+
         if(!food) {
             body.setFixedRotation(true);
-            fixtureDef.density=1000;
-            fixtureDef.friction=1;
         }
         else{
             body.getFixtureList().first().setSensor(true);
-            body.setAngularDamping(10);
-            body.setLinearDamping(10);
         }
+
         shape.dispose();
     }
 
@@ -99,9 +100,9 @@ abstract class GameObject {
         Color backup=batch.getColor();
         batch.setColor(color);
         if(body==null){
-            batch.draw(sprite, position.x - size.x / 2*indicatorSize, position.y - size.y / 2*indicatorSize, size.x / 2*indicatorSize, size.y / 2*indicatorSize, size.x*indicatorSize, size.y*indicatorSize, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+            batch.draw(sprite, position.x - size.x / 2*indicatorSize, position.y - size.y / 2*indicatorSize, size.x / 2*indicatorSize, size.y / 2*indicatorSize, size.x*indicatorSize, size.y*indicatorSize, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), false, false);
         }else {
-            batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);
+            batch.draw(sprite, body.getPosition().x - size.x / 2, body.getPosition().y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, body.getAngle() * MathUtils.radiansToDegrees, 0, 0, sprite.getWidth(), sprite.getHeight(), false, false);
         }
         batch.setColor(backup);
     }
@@ -126,7 +127,9 @@ abstract class GameObject {
             scene.player=null;
 
         }
-        scene.world.destroyBody(body);
+        if(body!=null) {
+            scene.world.destroyBody(body);
+        }
     }
     public void setSize(float newSize){
         size=new Vector2(size.x*newSize,size.y*newSize);
@@ -146,11 +149,16 @@ abstract class GameObject {
         body.setTransform(newPosition,angle);
     }
     void bodyFollow(float distance, GameObject gameObject2){
+
         Vector2 difference=position.cpy().sub(gameObject2.position);
-        float length=(float)Math.hypot(difference.x,difference.y);
-        Vector2 newPosition=gameObject2.position.cpy().add(difference.x/length*distance,difference.y/length*distance);
-        float angle=MathUtils.atan2(newPosition.y-position.y,newPosition.x-position.x)-90*MathUtils.degreesToRadians;
-        position=newPosition;
-        rotation=angle;
+        if(!difference.isZero()) {
+            float length = (float) Math.hypot(difference.x, difference.y);
+            Vector2 newPosition = gameObject2.position.cpy().add(difference.x / length * distance, difference.y / length * distance);
+            float angle = MathUtils.atan2(newPosition.y - position.y, newPosition.x - position.x) * MathUtils.radiansToDegrees - 90;
+            position = newPosition;
+            if(angle!=-90) {
+                rotation = angle;
+            }
+        }
     }
 }

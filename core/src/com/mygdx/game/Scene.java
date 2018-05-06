@@ -224,7 +224,11 @@ public class Scene extends ScreenAdapter {
 
         if(move!=null&&move.getClass()!=MenuMove.class&&scene==0) {
             scoreText.original = score + "";
-            timeText.original = minute + ":" + df.format(second);
+            if(second<10) {
+                timeText.original = minute + ":0"+df.format(second);
+            }else{
+                timeText.original = minute + ":"+df.format(second);
+            }
             scoreText.draw(batch);
             timeText.draw(batch);
         }
