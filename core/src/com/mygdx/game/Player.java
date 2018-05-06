@@ -68,13 +68,21 @@ class Player extends GameObject{
         joint.collideConnected = false;
 
         for(int i = 0; i < eyes.length; i++) {
+            float distance=0;
                 eyes[i][0] = new Eye("eye_new.png", 0.0005f, 0.0005f, -1, position, scene, true);
-                for (int o = 1; o < eyes[i].length; o++) {
+                for (int o = eyes[i].length-1; o > 0; o--) {
                     eyes[i][o] = new Eye("line.png", 0.0015f, 0.0025f, 0, position, scene, false);
-
-                    createJoint(eyes[i][o], eyes[i][o - 1], 0, 0.001f);
+                    eyes[i][o].originPosition=new Vector2((i*2 - 1f) / 5f, -size.y / 2+0.8f);
+                    distance+=eyes[i][o].size.y/2;
+                    eyes[i][o].speed=distance;
+                    distance+=eyes[i][o].size.y/2;
                 }
-                createJoint(otherBody, eyes[i][eyes[i].length - 1].body, (i*2 - 1f) / 5f, 0.5f);
+                for(int o = 1; o < eyes[i].length; o++){
+                    eyes[i][o].forwardEye=eyes[i][o-1];
+                }
+                eyes[i][0].originPosition=new Vector2((i*2 - 1f) / 5f, -size.y / 2+0.8f);
+            distance+=eyes[i][0].size.y/2;
+                eyes[i][0].speed=distance;
         }
     }
     @Override
@@ -119,14 +127,14 @@ class Player extends GameObject{
                 eaten.body.resetMassData();
 
 
-                if(bodyParts.size()!=0) {
+                /*if(bodyParts.size()!=0) {
                     scene.world.destroyJoint(theJoint);
                     createJoint(eaten,bodyParts.get(bodyParts.size() - 1),0,0);
                 }
                 createJoint(this, eaten, 0, 0);
+*/
 
-
-                bodyParts.add(eaten);
+                bodyParts.add(0,eaten);
                 scene.foods.remove(eaten);
                 scene.eaten = null;
 
@@ -203,7 +211,15 @@ class Player extends GameObject{
             camera.position.set(position, 0);
             camera.update();
             for (Eye[] eye : eyes) {
-                eye[0].move();
+                for(int i = 0; i < eye.length; i++) {
+                    eye[i].move();
+                }
+            }
+            if(bodyParts.size()>0) {
+                for (int i = bodyParts.size()-1; i >0 ; i--) {
+                    bodyParts.get(i).bodyFollow(0.5f,bodyParts.get(i-1).body);
+                }
+                bodyParts.get(0).bodyFollow(0.6f,body);
             }
         }else{
             exit.next();
@@ -233,7 +249,7 @@ class Player extends GameObject{
     void createJoint(GameObject object1, GameObject object2, float xDif,float yDif){
         joint.bodyA = object1.body;
         joint.bodyB = object2.body;
-        joint.localAnchorA.set(new Vector2(0+xDif, -object1.size.y / 2+yDif-Math.abs(xDif)));
+        joint.localAnchorA.set(new Vector2(0+xDif, -object1.size.y / 2+yDif));
         joint.localAnchorB.set(new Vector2(0, object2.size.y / 2));
         if(object1.getClass()==Player.class){
             theJoint=scene.world.createJoint(joint);

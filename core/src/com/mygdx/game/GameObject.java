@@ -138,4 +138,19 @@ abstract class GameObject {
         shape=r;
         type=r+1;
     }
+    void bodyFollow(float distance, Body body2){
+        Vector2 difference=body.getPosition().cpy().sub(body2.getPosition());
+        float length=(float)Math.hypot(difference.x,difference.y);
+        Vector2 newPosition=body2.getPosition().cpy().add(difference.x/length*distance,difference.y/length*distance);
+        float angle=MathUtils.atan2(newPosition.y-body.getPosition().y,newPosition.x-body.getPosition().x)-90*MathUtils.degreesToRadians;
+        body.setTransform(newPosition,angle);
+    }
+    void bodyFollow(float distance, GameObject gameObject2){
+        Vector2 difference=position.cpy().sub(gameObject2.position);
+        float length=(float)Math.hypot(difference.x,difference.y);
+        Vector2 newPosition=gameObject2.position.cpy().add(difference.x/length*distance,difference.y/length*distance);
+        float angle=MathUtils.atan2(newPosition.y-position.y,newPosition.x-position.x)-90*MathUtils.degreesToRadians;
+        position=newPosition;
+        rotation=angle;
+    }
 }

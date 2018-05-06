@@ -19,6 +19,7 @@ public class Object {
     Vector2 startPosition;
     OrthographicCamera camera;
 
+
     public Object(String name, float rotation, float x, float y, float sX, float sY, Color color, OrthographicCamera camera) {
         if(name!=null) {
             tex = new Texture(name);
