@@ -137,13 +137,24 @@ class Player extends GameObject {
             if (colorChanger != null) {
                 colorChanger.next();
                 playerColor = colorChanger.color;
+
+                if (scene.gameMode == 0) {
+                    scene.miniScenes.get(0).images.get(0).color = playerColor;
+                }
             }
+
             if (shapeChanger != null) {
                 shapeChanger.next();
 
                 if (shapeChanger.zoom == 0) {
                     indicator.sprite = new Texture(indicator.textures[scene.currentShapeToCollect]);
+                    scene.miniScenes.get(0).images.get(1).tex = new Texture(indicator.textures[scene.currentShapeToCollect]);
+
+                    if (scene.gameMode == 2) {
+                        scene.miniScenes.get(0).images.get(1).color = playerColor;
+                    }
                 }
+
                 indicator.indicatorSize = MathUtils.clamp(shapeChanger.zoom, 0.001f, 1);
             }
 

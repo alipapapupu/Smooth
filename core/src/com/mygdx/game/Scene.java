@@ -250,7 +250,7 @@ public class Scene extends ScreenAdapter {
             addFood();
         }
 
-
+        indicatorImageAdjust();
         backgroundMover();
     }
 
@@ -481,5 +481,21 @@ public class Scene extends ScreenAdapter {
         backgroundTextureSprite.setPosition(-backgroundTextureSprite.getWidth() / 2, -backgroundTextureSprite.getHeight() / 2);
 
         backgroundTextureSprite.setScale(0.01f);
+    }
+
+    void indicatorImageAdjust() {
+        if (gameMode != 0) {
+            if (main.scenes[1].miniScenes.get(0).images.get(0).color != Color.WHITE) {
+                main.scenes[1].miniScenes.get(0).images.get(0).color = Color.WHITE;
+            }
+            if (main.scenes[1].miniScenes.get(0).images.size() < 2) {
+                main.scenes[1].addImage(0, "square.png", 0, -260, -160, 1, 1, Color.WHITE);
+                main.scenes[1].miniScenes.get(0).images.get(1).size.set(30f, 30f);
+            }
+        } else if (gameMode == 0) {
+            if (main.scenes[1].miniScenes.get(0).images.size() > 1) {
+                main.scenes[1].miniScenes.get(0).images.remove(1);
+            }
+        }
     }
 }

@@ -79,6 +79,9 @@ public class Game extends com.badlogic.gdx.Game {
         scenes[1].addMiniScene();
         scenes[1].addButton(0,"pause.png",null,0,260,160,30,30,0,Button.TEXTURE,1,1,Color.WHITE);
 
+        scenes[1].addImage(0, "square.png", 0, -260, -160, 1, 1, Color.WHITE);
+        scenes[1].miniScenes.get(0).images.get(0).size.set(55f, 55f);
+
         scenes[1].addButton(1,null,"CONTINUE",0,0.2f,100f,150,50,0, Button.BOX,1,0,Color.GREEN);
         scenes[1].addButton(1,null,"CALIBRATE",0,0.2f,0f,150,50,0, Button.BOX,2,0,Color.GREEN);
         scenes[1].addButton(1,null,"EXIT",0,0.2f,-100f,150,50,0, Button.BOX,0,0,Color.GREEN);
