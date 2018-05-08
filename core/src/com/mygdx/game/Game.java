@@ -31,10 +31,12 @@ import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.physics.box2d.joints.RopeJoint;
 import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
+import com.badlogic.gdx.utils.I18NBundle;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 public class Game extends com.badlogic.gdx.Game {
@@ -52,6 +54,15 @@ public class Game extends com.badlogic.gdx.Game {
     boolean calibrate=false;
     BitmapFont font;
 
+    String start;
+    String newGame;
+    String game1;
+    String game2;
+    String game3;
+    String continueText;
+    String calibrationText;
+    String exitText;
+
     @Override
     public void create () {
         accelerometer=false;
@@ -65,15 +76,28 @@ public class Game extends com.badlogic.gdx.Game {
         }else{
             movement=new ComputerMove(center,this);
         }
+
+        Locale l = Locale.getDefault();
+        I18NBundle myBundle = I18NBundle.createBundle(Gdx.files.internal("MyBundle"), l);
+
+        start = myBundle.get("start");
+        newGame = myBundle.get("newGame");
+        game1 = myBundle.get("game1");
+        game2 = myBundle.get("game2");
+        game3 = myBundle.get("game3");
+        continueText = myBundle.get("continue");
+        calibrationText = myBundle.get("calibration");
+        exitText = myBundle.get("exit");
+
         scenes[0]=new Scene(0,new MenuMove(center,this),true,this);
         scenes[0].addMiniScene();
         scenes[0].addMiniScene();
-        scenes[0].addButton(0,null,"START",0,0.2f,-100f,150,50,0, Button.BOX,1,1,Color.GREEN);
+        scenes[0].addButton(0,null,start,0,0.2f,-100f,150,50,0, Button.BOX,1,1,Color.GREEN);
         scenes[0].addImage(0,"title.png",0,0,130,1,1,Color.WHITE);
-        scenes[0].addButton(1,null,"New Game",0,0.2f,100f,150,50,0, Button.BOX,1,2,Color.GREEN);
-        scenes[0].addButton(2, null, "Game 1",0,-200,0,150,50,0,Button.BOX,0,1,Color.GREEN);
-        scenes[0].addButton(2, null, "Game 2",0,0,0,150,50,0,Button.BOX,0,2,Color.GREEN);
-        scenes[0].addButton(2, null, "Game 3",0,200,0,150,50,0,Button.BOX,0,3,Color.GREEN);
+        scenes[0].addButton(1,null,newGame,0,0.2f,100f,150,50,0, Button.BOX,1,2,Color.GREEN);
+        scenes[0].addButton(2, null, game1,0,-200,0,150,50,0,Button.BOX,0,1,Color.GREEN);
+        scenes[0].addButton(2, null, game2,0,0,0,150,50,0,Button.BOX,0,2,Color.GREEN);
+        scenes[0].addButton(2, null, game3,0,200,0,150,50,0,Button.BOX,0,3,Color.GREEN);
 
         scenes[1]=new Scene(0,movement,true,this);
         scenes[1].addMiniScene();
@@ -82,9 +106,9 @@ public class Game extends com.badlogic.gdx.Game {
         scenes[1].addImage(0, "square.png", 0, -260, -160, 1, 1, Color.WHITE);
         scenes[1].miniScenes.get(0).images.get(0).size.set(55f, 55f);
 
-        scenes[1].addButton(1,null,"CONTINUE",0,0.2f,100f,150,50,0, Button.BOX,1,0,Color.GREEN);
-        scenes[1].addButton(1,null,"CALIBRATE",0,0.2f,0f,150,50,0, Button.BOX,2,0,Color.GREEN);
-        scenes[1].addButton(1,null,"EXIT",0,0.2f,-100f,150,50,0, Button.BOX,0,0,Color.GREEN);
+        scenes[1].addButton(1,null,continueText,0,0.2f,100f,150,50,0, Button.BOX,1,0,Color.GREEN);
+        scenes[1].addButton(1,null,calibrationText,0,0.2f,0f,150,50,0, Button.BOX,2,0,Color.GREEN);
+        scenes[1].addButton(1,null,exitText,0,0.2f,-100f,150,50,0, Button.BOX,0,0,Color.GREEN);
         enemyMove=new Movement(-3,3);
         foodMove=new Movement(-1,1);
 
