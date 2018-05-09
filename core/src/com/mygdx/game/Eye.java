@@ -8,21 +8,59 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Created by Severi on 19.3.2018.
+ * Eye - game object.
  */
-
 public class Eye extends GameObject {
+
+    /**
+     * Eye object.
+     */
     Eye forwardEye;
+
+    /**
+     * Helper boolean for eye determining.
+     */
     boolean theEye;
+
+    /**
+     * Vector2 position for eye
+     */
     Vector2 center;
+
+    /**
+     * Vector2 position for eye origin.
+     */
     Vector2 originPosition;
+
+    /**
+     * Eye speed.
+     */
     float speed;
+
+    /**
+     * Helper variable for side determining.
+     */
     int side;
+
+    /**
+     * Constructor for indicator eye.
+     * @param name helper string for textures.
+     * @param width eye width.
+     * @param height eye height.
+     * @param color eye color.
+     * @param position vector2 coordinate for eye position.
+     * @param scene main game scene.
+     * @param theEye helper boolean.
+     */
     public Eye(String name,float width, float height, int color, Vector2 position, Scene scene,boolean theEye){
         super(new Texture(name),width,height,color,position,scene);
 
         this.theEye=theEye;
     }
+
+    /**
+     * Eye movement.
+     */
     public void move() {
         float angle = scene.player.body.getAngle();
         center = new Vector2(originPosition.x * MathUtils.cos(angle) - originPosition.y * MathUtils.sin(angle), originPosition.y * MathUtils.cos(angle) + originPosition.x * MathUtils.sin(angle)).add(scene.player.body.getPosition());
@@ -51,6 +89,11 @@ public class Eye extends GameObject {
         }
         position = newPosition;
     }
+
+    /**
+     * Draws the eye.
+     * @param batch to render sprite.
+     */
     @Override
     void draw(SpriteBatch batch){
         batch.draw(sprite, position.x - size.x / 2, position.y - size.y / 2, size.x / 2, size.y / 2, size.x, size.y, 1, 1, rotation, 0, 0, sprite.getWidth(), sprite.getHeight(), true, false);

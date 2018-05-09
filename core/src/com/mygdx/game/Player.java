@@ -21,27 +21,84 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
- * Created by Severi on 16.3.2018.
+ * Player - game object.
  */
-
-
 class Player extends GameObject {
-    float sumMass = 0.1f;
-    float sumDamping = 10;
+
+    /**
+     * Changer for zoom modifying.
+     */
     Changer zoomChanger;
+
+    /**
+     * Changer for color modifying.
+     */
     Changer colorChanger;
+
+    /**
+     * Changer for shape modifying.
+     */
     Changer shapeChanger;
+
+    /**
+     * Changer for modifying changers.
+     */
     Changer exit;
+
+    /**
+     * Player color.
+     */
     Color playerColor;
+
+    /**
+     * Player movement.
+     */
     PlayerMove movement;
+
+    /**
+     * Helper boolean for calibration.
+     */
     boolean ready = false;
+
+    /**
+     * Orthographic camera for player.
+     */
     OrthographicCamera camera;
+
+    /**
+     * List of all player bodyparts.
+     */
     ArrayList<Food> bodyParts = new ArrayList<Food>();
+
+    /**
+     * Player eyes.
+     */
     Eye[][] eyes = new Eye[2][3];
+
+    /**
+     * Helper for collectable indicating.
+     */
     Food indicator;
+
+    /**
+     * Helper boolean for calibration detection.
+     */
     boolean calibration = true;
+
+    /**
+     * Helper boolean for game running detection.
+     */
     boolean over = false;
 
+    /**
+     * Constructor for player.
+     * @param mode determines game mode.
+     * @param position vector2 coordinates for player position.
+     * @param scene main game scene.
+     * @param world box2d world.
+     * @param camera orthographic camera for player.
+     * @param move player movement.
+     */
     Player(int mode, Vector2 position, Scene scene, World world, OrthographicCamera camera, PlayerMove move) {
         super(new Texture(new String[]{"player3.png", "player2.png", "player4.png"}[mode]), 0.002f, 0.002f, scene.currentColorToCollect, position, scene);
         movement = move;
@@ -85,6 +142,11 @@ class Player extends GameObject {
         }
     }
 
+    /**
+     * Creates player body.
+     * @param size vector2 for player x and y size.
+     * @param fixed helper boolean.
+     */
     @Override
     void createBody(Vector2 size, boolean fixed) {
         PolygonShape shape = new PolygonShape();
@@ -92,6 +154,10 @@ class Player extends GameObject {
         createOtherBody(shape);
     }
 
+    /**
+     * Creates a body.
+     * @param shape body shape.
+     */
     void createOtherBody(PolygonShape shape) {
 
         BodyDef bodyDef = new BodyDef();
@@ -111,6 +177,9 @@ class Player extends GameObject {
         shape.dispose();
     }
 
+    /**
+     * Player body movement.
+     */
     public void move() {
 
         if (!over) {
@@ -220,6 +289,10 @@ class Player extends GameObject {
         }
     }
 
+    /**
+     * Draws the player.
+     * @param batch to render sprite.
+     */
     void draw(SpriteBatch batch) {
         for (int i = bodyParts.size() - 1; i >= 0; i--) {
             bodyParts.get(i).draw(batch);
@@ -238,10 +311,18 @@ class Player extends GameObject {
         batch.setColor(Color.WHITE);
     }
 
+    /**
+     * For color changing.
+     * @param newColor new color.
+     */
     public void changeColor(int newColor) {
         colorChanger.newTime(colors[newColor].cpy());
     }
 
+    /**
+     * For shape changing
+     * @param newShape new shape.
+     */
     public void changeShape(int newShape) {
         shapeChanger.newTime();
     }

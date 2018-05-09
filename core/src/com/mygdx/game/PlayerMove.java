@@ -7,30 +7,100 @@ import com.badlogic.gdx.math.Vector2;
 import java.text.DecimalFormat;
 
 /**
- * Created by Severi on 16.3.2018.
+ * Player movement.
  */
+class PlayerMove {
 
-class PlayerMove{
+    /**
+     * Vector2 coordinates for movement zero point.
+     */
     Vector2 zeroPoint = Vector2.Zero;
+
+    /**
+     * Main game scene.
+     */
     Scene scene;
+
+    /**
+     * Movement radius x.
+     */
     final float radiusX = 0.6f;
+
+    /**
+     * Movement radius y.
+     */
     final float radiusY = 0.5f;
+
+    /**
+     * Movement speed.
+     */
     float speed = 5;
-    final float error = 0.01f;
+
+    /**
+     * Helper variable.
+     */
     final int SIZE = 2;
+
+    /**
+     * Helper variable.
+     */
     final float MAX = 3;
+
+    /**
+     * Helper variable.
+     */
     int which = 0;
+
+    /**
+     * Vector2 coordinates for current point.
+     */
     Vector2 point;
+
+    /**
+     * Vector2 coordinates for player direction.
+     */
     Vector2 direction;
+
+    /**
+     * Border value for player movement.
+     */
     float[] maxBorder = new float[]{0, 0, 0, 0};
+
+    /**
+     * Test border values for player movement.
+     */
     float[] testBorder=new float[]{0,0,0,0};
+
+    /**
+     * Vector2 for average
+     */
     Vector2[] average=new Vector2[5];
-    
+
+    /**
+     * Main game class.
+     */
     Game game;
+
+    /**
+     * Helper game object.
+     */
     GameObject center;
+
+    /**
+     * All player movement borders.
+     */
     public float[][] allBorder = new float[SIZE + 1][4];
+
+    /**
+     * For decimal formatting.
+     */
     private static DecimalFormat df2 = new DecimalFormat(".#");
 
+    /**
+     * Constructor for player movement.
+     * @param center helper game object.
+     * @param game main game class.
+     */
     public PlayerMove(GameObject center, Game game) {
         this.game=game;
         this.center=center;
@@ -39,6 +109,9 @@ class PlayerMove{
         center();
     }
 
+    /**
+     * Empties movement all border array and averages.
+     */
     public void empty() {
         for (int i = 0; i < allBorder.length; i++) {
             for (int o = 0; o < allBorder[i].length; o++) {
@@ -50,10 +123,18 @@ class PlayerMove{
         }
 
     }
+
+    /**
+     * Gets new zero point from accelerometer values.
+     */
     void center(){
         zeroPoint = new Vector2(Gdx.input.getAccelerometerY(), (Gdx.input.getAccelerometerZ ()));
     }
 
+    /**
+     * Gets calibration grid values.
+     * @return boolean depending on the result.
+     */
     public boolean grid() {
         //empty();
         getPoint();
@@ -104,6 +185,10 @@ class PlayerMove{
         return false;
     }
 
+    /**
+     * Used to get position depending on the current point.
+     * @return values for position.
+     */
     public Vector2 getPosition() {
         getPoint();
         Vector2 position = new Vector2(0, 0);
@@ -122,11 +207,18 @@ class PlayerMove{
         return regulate(position);
     }
 
+    /**
+     * Used to control rotation.
+     * @return rotation value.
+     */
     public float getRotation() {
         float rotation= MathUtils.atan2(point.y, point.x) * MathUtils.radiansToDegrees;
         return rotation-rotation%4;
     }
 
+    /**
+     * Used to get players current point.
+     */
     void getPoint() {
         for(int i = 1; i < average.length; i++){
             average[i]=average[i-1];
@@ -146,6 +238,11 @@ class PlayerMove{
         point = ave;
     }
 
+    /**
+     * Used to regulate position movement.
+     * @param position vector2 for current position.
+     * @return regulated position.
+     */
     Vector2 regulate(Vector2 position){
         double distance=Math.hypot(position.x,position.y);
         if(distance>speed) {
@@ -155,6 +252,9 @@ class PlayerMove{
         return position;
     }
 
+    /**
+     * Used for movement/calibration testing.
+     */
     public void test(){
         if(point.x>testBorder[1]){
             testBorder[1]=point.x;

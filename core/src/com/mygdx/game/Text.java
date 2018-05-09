@@ -12,19 +12,70 @@ import com.badlogic.gdx.math.Vector3;
 import com.sun.org.apache.xpath.internal.operations.Or;
 
 /**
- * Created by Severi on 6.4.2018.
+ * Text - object.
  */
 class Text extends Object{
 
+    /**
+     * Matrix4 to help with text drawing.
+     */
     Matrix4 mat;
+
+    /**
+     * Wanted text as a string.
+     */
     String text;
+
+    /**
+     * Text font.
+     */
     BitmapFont font;
+
+    /**
+     * Text width.
+     */
     float width;
+
+    /**
+     * Helper integer for text alignment.
+     */
     int align;
+
+    /**
+     * Contains glyph runs for the text.
+     */
     GlyphLayout layout;
+
+    /**
+     * Helper boolean for text formatting.
+     */
     boolean format=false;
+
+    /**
+     * Helper variable.
+     */
     int more=0;
+
+    /**
+     * Text before formatting.
+     */
     String original;
+
+    /**
+     * Constructor for text.
+     * @param text wanted text string.
+     * @param format helper boolean for text format.
+     * @param rotation text rotation.
+     * @param x text x coordinate.
+     * @param y text y coordinate.
+     * @param width text width.
+     * @param align text height.
+     * @param sX source Xcoord.
+     * @param sY source Ycoord.
+     * @param color text color.
+     * @param font text font.
+     * @param camera orthographic camera for text.
+     */
     public Text(String text, boolean format, float rotation, float x, float y, float width, int align, float sX, float sY, Color color, BitmapFont font,OrthographicCamera camera){
         super(null,rotation,x,y,sX,sY,color,camera);
 
@@ -38,6 +89,10 @@ class Text extends Object{
         layout=new GlyphLayout();
     }
 
+    /**
+     * Draws the actual text.
+     * @param batch to render sprite.
+     */
     @Override
     public void draw(SpriteBatch batch){
         boolean drawing=false;

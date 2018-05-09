@@ -25,53 +25,197 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by Severi on 19.3.2018.
+ * Main game scene.
  */
-
 public class Scene extends ScreenAdapter {
+
+    /**
+     * List for collectables.
+     */
     ArrayList<Food> foods=new ArrayList<Food>();
+
+    /**
+     * List for game objects.
+     */
     ArrayList<GameObject> gameObjects=new ArrayList<GameObject>();
+
+    /**
+     * List for foods to be deleted.
+     */
     ArrayList<Food> foodsToDelete=new ArrayList<Food>();
+
+    /**
+     * List for mini scenes.
+     */
     ArrayList<MiniScene> miniScenes=new ArrayList<MiniScene>();
+
+    /**
+     * Player - game object.
+     */
     Player player;
+
+    /**
+     * Collectables which are attached to players body.
+     */
     Food eaten;
-    //ArrayList<Enemy> enemies=new ArrayList<Enemy>();
+
+    /**
+     * Game world - box2d feature.
+     */
     World world;
+
+    /**
+     * Background image.
+     */
     Texture background;
+
+    /**
+     * Different background images.
+     */
     String[] backgrounds=new String[]{"background.png","background2.png","background3.png","calibration.png"};
+
+    /**
+     * Orthographic camera for main view.
+     */
     OrthographicCamera camera=new OrthographicCamera();
+
+    /**
+     * Orthographic camera for fonts.
+     */
     OrthographicCamera fontCamera=new OrthographicCamera();
+
+    /**
+     * Random - java util.
+     */
     Random random = new Random();
+
+    /**
+     * Helper boolean for game running.
+     */
     boolean game;
+
+    /**
+     * To render sprites.
+     */
     SpriteBatch batch;
+
+    /**
+     * To render shapes.
+     */
     ShapeRenderer shapeRenderer;
+
+    /**
+     * Game - class.
+     */
     Game main;
+
+    /**
+     * Helper variable to keep track of current scenes.
+     */
     int scene=0;
+
+    /**
+     * Integer of current color to collect in colors[].
+     */
     int currentColorToCollect;
+
+    /**
+     * Integer of current shape to collect in textures[].
+     */
     int currentShapeToCollect;
+
+    /**
+     * Used to insert player texture.
+     */
     int playerTex;
+
+    /**
+     * Players movement.
+     */
     PlayerMove move;
+
+    /**
+     * Timer used mainly to change collectable color/shape.
+     */
     Timer timer;
+
+    /**
+     * Players current score.
+     */
     int score=0;
+
+    /**
+     * Time - seconds.
+     */
     float second=0;
+
+    /**
+     * Time - minutes.
+     */
     int minute=0;
+
+    /**
+     * Text to show players score.
+     */
     Text scoreText;
+
+    /**
+     * Text to show current time.
+     */
     Text timeText;
+
+    /**
+     * Formats text to decimal format.
+     */
     DecimalFormat df = new DecimalFormat("##");
 
+    /**
+     * Helper variable to keep track of game modes.
+     */
     int gameMode=0;
 
+    /**
+     * Integer of former color to collect in colors[].
+     */
     int formerColorToCollect;
+
+    /**
+     * Integer of former shape to collect in textures[].
+     */
     int formerShapeToCollect;
 
+    /**
+     * Background sprite.
+     */
     Sprite backgroundTextureSprite;
+
+    /**
+     * Maximum collectable spawn distance from players current point.
+     */
     float maxSpawnDistance = 12f;
+
+    /**
+     * Maximum collectable spawn distance from players current point.
+     */
     float maxFoodDistance = 16f;
+
+    /**
+     * Maximum concurrent background repeat width.
+     */
     int maxBackgroundWidth = 4;
+
+    /**
+     * Maximum concurrent background repeat height.
+     */
     int maxBackgroundHeight = 4;
 
-    boolean calibration=false;
-
+    /**
+     * Constructor for main game scene.
+     * @param tex indicates
+     * @param move player movement.
+     * @param game helper boolean for game running.
+     * @param main Game - class.
+     */
     public Scene(int tex, PlayerMove move,boolean game, Game main){
         this.game=game;
         this.main=main;
@@ -89,6 +233,10 @@ public class Scene extends ScreenAdapter {
             move.scene=this;
             world = new World(new Vector2(0, 0), true);
             world.setContactListener(new ContactListener() {
+                /**
+                 * Basic contact listener.
+                 * @param contact indicates contact.
+                 */
                 @Override
                 public void beginContact(Contact contact) {
                     if(contact.getFixtureA().getBody()==player.body||contact.getFixtureB().getBody()==player.body) {
@@ -170,10 +318,10 @@ public class Scene extends ScreenAdapter {
         //fontCamera.zoom=5;
     }
 
-    public void addFood(float posX,float posY){
-        foods.add(new Food(new Vector2(posX, posY),this));
-    }
-
+    /**
+     * Renders the game.
+     * @param delta helper variable.
+     */
     @Override
     public void render(float delta) {
         if(game) {
@@ -192,6 +340,9 @@ public class Scene extends ScreenAdapter {
         draw();
     }
 
+    /**
+     * Draws objects to the screen.
+     */
     public void draw(){
         if(game) {
             move();
@@ -238,6 +389,9 @@ public class Scene extends ScreenAdapter {
 
     }
 
+    /**
+     * Update the frame.
+     */
     void move(){
         player.move();
         for (int i = 0; i < foods.size(); i++) {
@@ -254,8 +408,12 @@ public class Scene extends ScreenAdapter {
         backgroundMover();
     }
 
-
-
+    /**
+     * Random integer between min and max value.
+     * @param min minimum integer value.
+     * @param max maximum integer value.
+     * @return random integer.
+     */
     public int randomInt(int min, int max) {
 
         int randomNum = random.nextInt((max - min) + 1) + min;
@@ -263,6 +421,12 @@ public class Scene extends ScreenAdapter {
         return randomNum;
     }
 
+    /**
+     * Random float between min and max value.
+     * @param min minimum float value.
+     * @param max maximum float value.
+     * @return random float.
+     */
     public float randomCoord(float min, float max) {
 
         float randomNum = random.nextFloat() * (max - min)+  min;
@@ -271,6 +435,11 @@ public class Scene extends ScreenAdapter {
 
     }
 
+    /**
+     * Sorts calibration value array to descending order.
+     * @param sectorWeightArray calibration values.
+     * @return sorted array.
+     */
     public static float[] sortArray(float[] sectorWeightArray) {
         float[] sortedSectorWeightArray = new float[sectorWeightArray.length];
         float t;
@@ -290,11 +459,18 @@ public class Scene extends ScreenAdapter {
         return sortedSectorWeightArray;
     }
 
+    /**
+     * Adds a collectable.
+     */
     public void addFood() {
         Vector2 foodPosition=newFoodPosition();
         foods.add(new Food(foodPosition,this));
     }
 
+    /**
+     * Defines the position for collectable foods.
+     * @return vector2 coordinates for new food.
+     */
     public Vector2 newFoodPosition(){
         Vector2 returner=new Vector2(0,0);
 
@@ -359,6 +535,10 @@ public class Scene extends ScreenAdapter {
         return returner;
     }
 
+    /**
+     * Method which is used to delete bodies from the world completely.
+     *
+     */
     void deleteBodies() {
         if(score>0) {
             player.zoomChanger.newTime(camera.zoom - 1f / player.bodyParts.size() / 10);
@@ -377,6 +557,9 @@ public class Scene extends ScreenAdapter {
         foodsToDelete.clear();
     }
 
+    /**
+     * Method which is used to delete collectables which are too far.
+     */
     public void foodDelete() {
         for (Food food:foods) {
             if (food.body.getPosition().x + maxFoodDistance < player.body.getPosition().x || food.body.getPosition().y + maxFoodDistance < player.body.getPosition().y || food.body.getPosition().x - maxFoodDistance > player.body.getPosition().x || food.body.getPosition().y - maxFoodDistance > player.body.getPosition().y) {
@@ -387,6 +570,9 @@ public class Scene extends ScreenAdapter {
         }
     }
 
+    /**
+     * Moves background as player moves on the map.
+     */
     void backgroundMover(){
         if(player.position.x>backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2+backgroundTextureSprite.getWidth()/4*backgroundTextureSprite.getScaleX())){
             backgroundTextureSprite.setX(backgroundTextureSprite.getX()+(backgroundTextureSprite.getWidth()/2*backgroundTextureSprite.getScaleX()));
@@ -400,32 +586,91 @@ public class Scene extends ScreenAdapter {
         }
     }
 
+    /**
+     * Moves background as player moves on the map.
+     */
     public void addGameObject(String tex, float width, float height,int color, int x, int y){
         gameObjects.add(new GameObject(new Texture(tex),width, height, color, new Vector2(x,y),this) {public void move() {}});
     }
 
+    /**
+     * Adds game object.
+     * @param object game object.
+     */
     public void addGameObject(GameObject object){
         gameObjects.add(object);
     }
 
+    /**
+     * Adds a button.
+     * @param miniScene integer of wanted mini scene.
+     * @param texName texture name.
+     * @param text button text.
+     * @param rotation rotation.
+     * @param X x coordinate.
+     * @param Y y coordinate.
+     * @param sX source Xcoord.
+     * @param sY source Ycoord.
+     * @param type type integer.
+     * @param shape button shape integer, defines button shape.
+     * @param action wanted action.
+     * @param which helper integer.
+     * @param col button color.
+     */
     public void addButton(int miniScene, String texName, String text, float rotation, float X, float Y, float sX, float sY,int type, int shape, int action, int which, Color col){
         miniScenes.get(miniScene).buttons.add(new Button(texName,text,rotation,X,Y,sX,sY,type,shape,action,which, col,main,this));
     }
+
+
+    /**
+     * Adds text.
+     * @param miniScene integer of wanted mini scene.
+     * @param texName texture name.
+     * @param rotation rotation.
+     * @param X x coordinate.
+     * @param Y y coordinate.
+     * @param sX source Xcoord.
+     * @param sY source Ycoord.
+     * @param col text color.
+     */
     void addText(int miniScene, String texName, String text, float rotation, float X, float Y, float sX,float sY, Color col){
         miniScenes.get(miniScene).texts.add(new Text(text,true,rotation,X,Y,1, Align.center, sX, sY, col, main.font, fontCamera));
     }
+
+    /**
+     * Adds an image.
+     * @param miniScene integer of wanted mini scene.
+     * @param texName texture name.
+     * @param rotation rotation.
+     * @param x x coordinate.
+     * @param y y coordinate.
+     * @param sX source Xcoord.
+     * @param sY source Ycoord.
+     * @param col color.
+     */
     void addImage(int miniScene, String texName, float rotation, float x, float y, float sX, float sY,Color col){
         miniScenes.get(miniScene).images.add(new Object(texName,rotation,x,y,sX,sY,col,fontCamera));
     }
 
+    /**
+     * Adds mini scene.
+     */
     public void addMiniScene(){
         miniScenes.add(new MiniScene(fontCamera));
     }
 
+    /**
+     * Sets scene accordingly.
+     * @param i helper integer.
+     */
     public void set(int i){
         scene=i;
     }
 
+    /**
+     * Recreates scene.
+     * @param i helper integer.
+     */
     void recreate(int i){
         if(game) {
             player = new Player(i, new Vector2(0, 0), this, world, camera, move);
@@ -459,6 +704,9 @@ public class Scene extends ScreenAdapter {
         }
     }
 
+    /**
+     * Resets game variables.
+     */
     void empty(){
         if(game) {
             score=0;
@@ -473,6 +721,11 @@ public class Scene extends ScreenAdapter {
         }
         camera.zoom=1;
     }
+
+    /**
+     * Sets background.
+     * @param i background textures integer in backgrounds[].
+     */
     void setBackground(int i){
 
         background = new Texture(backgrounds[i]);
@@ -483,6 +736,9 @@ public class Scene extends ScreenAdapter {
         backgroundTextureSprite.setScale(0.01f);
     }
 
+    /**
+     * Changes indicator depending on the game mode.
+     */
     void indicatorAdjust() {
         if (gameMode != 0) {
             if (main.scenes[1].miniScenes.get(0).images.get(0).color != Color.WHITE) {

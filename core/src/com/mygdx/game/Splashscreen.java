@@ -5,14 +5,34 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 
 /**
- * Created by Severi on 4.5.2018.
+ * Before main menu splash screens.
  */
-
 public class Splashscreen extends Scene {
+
+    /**
+     * Timer for screen changing.
+     */
     Changer timer;
+
+    /**
+     * Color to change from.
+     */
     Color from=new Color(1,1,1,0);
+
+    /**
+     * Color to change to.
+     */
     Color to=new Color(1,1,1,1);
+
+    /**
+     * Helper variable for modes.
+     */
     int mode=1;
+
+    /**
+     * Constructor for splash screens.
+     * @param game main game class.
+     */
     public Splashscreen(Game game){
         super(-1,null,false,game);
 
@@ -24,6 +44,9 @@ public class Splashscreen extends Scene {
         timer.newTime(to);
     }
 
+    /**
+     * Draws the splash screen.
+     */
     @Override
     public void draw(){
         super.draw();

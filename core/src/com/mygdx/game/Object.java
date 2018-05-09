@@ -7,19 +7,56 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Created by Severi on 6.4.2018.
+ * Defines objects.
  */
-
 public class Object {
+
+    /**
+     * Object texture.
+     */
     Texture tex;
+
+    /**
+     * Object rotation.
+     */
     float rotation;
+
+    /**
+     * Vector2 coordinates for object position.
+     */
     Vector2 position;
+
+    /**
+     * Vector2 for objects x and y size.
+     */
     Vector2 size;
+
+    /**
+     * Object color.
+     */
     Color color;
+
+    /**
+     * Vector2 coordinates for objects start position.
+     */
     Vector2 startPosition;
+
+    /**
+     * Orthographic camera for objects.
+     */
     OrthographicCamera camera;
 
-
+    /**
+     * Constructor for object.
+     * @param name helper variable for texture defining.
+     * @param rotation object rotation.
+     * @param x x coordinate.
+     * @param y y coordinate.
+     * @param sX source Xcoord.
+     * @param sY source Ycoord.
+     * @param color object color.
+     * @param camera orthographic camera for object.
+     */
     public Object(String name, float rotation, float x, float y, float sX, float sY, Color color, OrthographicCamera camera) {
         if(name!=null) {
             tex = new Texture(name);
@@ -32,6 +69,10 @@ public class Object {
         this.color=color;
     }
 
+    /**
+     * Draws object.
+     * @param batch to render sprite.
+     */
     void draw(SpriteBatch batch) {
         updatePos();
         batch.begin();
@@ -41,6 +82,9 @@ public class Object {
         batch.end();
     }
 
+    /**
+     * Updating vector2 coordinates for object position.
+     */
     void updatePos(){
         position=new Vector2(startPosition.x+camera.position.x,startPosition.y+camera.position.y);
     }

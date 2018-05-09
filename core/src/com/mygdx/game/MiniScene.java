@@ -9,18 +9,43 @@ import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 
 /**
- * Created by Severi on 9.4.2018.
+ * Mini scenes for game transitions.
  */
-
 public class MiniScene {
+
+    /**
+     * List for all buttons in the scene.
+     */
     ArrayList<Button> buttons=new ArrayList<Button>();
+
+    /**
+     * List for all texts in the scene.
+     */
     ArrayList<Text> texts=new ArrayList<Text>();
+
+    /**
+     * List for all images in the scene.
+     */
     ArrayList<Object> images=new ArrayList<Object>();
+
+    /**
+     * Orthographic camera for scene.
+     */
     OrthographicCamera camera;
 
+    /**
+     * Constructor for mini scene.
+     * @param camera orthographic scene camera.
+     */
     MiniScene (OrthographicCamera camera){
         this.camera=camera;
     }
+
+    /**
+     * Draws the scene.
+     * @param batch to render sprites.
+     * @param shapeRenderer to render shapes.
+     */
     void draw(SpriteBatch batch, ShapeRenderer shapeRenderer){
 
         for (Button button:buttons) {

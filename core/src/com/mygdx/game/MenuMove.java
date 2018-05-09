@@ -4,22 +4,34 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Created by Severi on 8.4.2018.
+ * Main menu movement.
  */
-
 public class MenuMove extends PlayerMove {
+
+    /**
+     * Constructor for main menu movement.
+     * @param center game object.
+     * @param game main game class.
+     */
     public MenuMove(GameObject center, Game game) {
         super(center, game);
         maxBorder = new float[]{1, 1, -1, -1};
         zeroPoint=Vector2.Zero;
     }
 
+    /**
+     * Override for calibration grid.
+     * @return returns true.
+     */
     @Override
     public boolean grid(){
         game.calibrate=false;
         return true;
     }
 
+    /**
+     * Movement point for ai movement.
+     */
     @Override
     void getPoint() {
         float distance = 1000;

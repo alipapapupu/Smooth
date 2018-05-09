@@ -9,18 +9,67 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
 
 /**
- * Created by Severi on 6.4.2018.
+ * Button - object.
  */
-
 public class Button extends Object {
+
+    /**
+     * Shape integers.
+     */
     static final int CIRCLE=0,BOX=1,ELLIPSE=2,CONE=3,LINE=4,ARC=5,POLYGON=6, TEXTURE=7;
+
+    /**
+     * Helper integer for shape.
+     */
     int shape;
+
+    /**
+     * Button action
+     */
     int action;
+
+    /**
+     * Helper integer.
+     */
     int type;
+
+    /**
+     * Helper integer.
+     */
     int which;
+
+    /**
+     * Basic text.
+     */
     Text text;
+
+    /**
+     * Game class.
+     */
     Game game;
+
+    /**
+     * Main game scene.
+     */
     Scene scene;
+
+    /**
+     * Constructor for basic button.
+     * @param tex button texture.
+     * @param text button text.
+     * @param rotation button rotation.
+     * @param x button x coordinate.
+     * @param y button y coordinate.
+     * @param sX source Xcoord.
+     * @param sY source Ycoord.
+     * @param type type integer.
+     * @param shape defines button shape.
+     * @param action button action.
+     * @param which helper integer.
+     * @param color button color.
+     * @param game game class.
+     * @param scene main game scene.
+     */
     public Button(String tex, String text, float rotation, float x, float y, float sX, float sY, int type, int shape, int action, int which, Color color, Game game,Scene scene) {
         super(tex, rotation, x, y, sX, sY, color,scene.fontCamera);
         size = new Vector2(sX, sY);
@@ -35,6 +84,10 @@ public class Button extends Object {
         }
     }
 
+    /**
+     * Draws the button.
+     * @param rend shape renderer parameter.
+     */
     public void draw(ShapeRenderer rend){
         updatePos();
         rend.begin(ShapeRenderer.ShapeType.Filled);
@@ -74,6 +127,10 @@ public class Button extends Object {
         }
     }
 
+    /**
+     * Defines actions when a button is pressed.
+     * @param mousePosition vector3 coordinates for mouse position.
+     */
     public void pressed(Vector3 mousePosition){
         if((Gdx.input.justTouched()&&type==0)||type==1) {
             if (position.x + size.x / 2 > mousePosition.x && position.x - size.x / 2 < mousePosition.x&&
@@ -83,6 +140,9 @@ public class Button extends Object {
         }
     }
 
+    /**
+     * Defines button actions.
+     */
     void action(){
         if(action==0){
             game.set(which);
